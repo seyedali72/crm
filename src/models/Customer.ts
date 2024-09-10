@@ -1,9 +1,9 @@
 import { queriesForSoftDelete } from '@/app/utils/helpers'
-import { ILead } from '@/app/utils/types'
+import { ICustomer } from '@/app/utils/types'
 import crypto from 'crypto'
 import { Schema, model, Model, models } from 'mongoose'
 
-const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
+const baseCustomerSchema = new Schema<ICustomer, Model<ICustomer, any, any>, any>(
 	{
 		name: {
 			type: String,
@@ -23,6 +23,7 @@ const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
 		email: { type: String, trim: true, },
 		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date } }],
 		call: [{ status: { type: String }, time: { type: Date } }],
+		convert: { convertor:{ type: Schema.Types.ObjectId, ref: 'Expert' }, time: { type: Date } },
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
@@ -31,7 +32,7 @@ const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
 	},
 )
 
-baseLeadSchema.method({
+baseCustomerSchema.method({
 	softDelete: async function () {
 		this.mobile_number += '-deleted'
 		this.$isDeleted(true)
@@ -49,18 +50,18 @@ baseLeadSchema.method({
 })
 
 // calling methods
-baseLeadSchema.static('fillRandom', function () {
-	return `lead-${crypto.randomUUID().slice(0, 10)}`
+baseCustomerSchema.static('fillRandom', function () {
+	return `customer-${crypto.randomUUID().slice(0, 10)}`
 })
 
 // calling hooks
 queriesForSoftDelete.forEach((type: any) => {
-	baseLeadSchema.pre(type, async function (next: any) {
+	baseCustomerSchema.pre(type, async function (next: any) {
 		// @ts-ignore
 		this.where({ isDeleted: false })
 		next()
 	})
 })
 
-const Lead = models.Lead || model<ILead>('Lead', baseLeadSchema)
-export default Lead
+const Customer = models.Customer || model<ICustomer>('Customer', baseCustomerSchema)
+export default Customer

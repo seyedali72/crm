@@ -18,6 +18,9 @@ export default function RootLayout({
       <body style={{  padding: 15 }} >
         <ul style={{display:'flex', gap:25, padding:10}}>
           <Link href={`/`}><li>خانه</li></Link>
+          <Link href={`/user`}><li>پرسنل</li></Link>
+          <Link href={`/expert`}><li>کارشناس ها</li></Link>
+          <Link href={`/teams`}><li>تیم ها</li></Link>
           <Link href={`/leads`}><li>سرنخ ها</li></Link>
           <Link href={`/customers`}><li>مشتریان ها</li></Link>
         </ul>

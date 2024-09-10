@@ -1,28 +1,29 @@
 import { queriesForSoftDelete } from '@/app/utils/helpers'
-import { ILead } from '@/app/utils/types'
+import { IExpert } from '@/app/utils/types'
 import crypto from 'crypto'
 import { Schema, model, Model, models } from 'mongoose'
 
-const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
+const baseExpertSchema = new Schema<IExpert, Model<IExpert, any, any>, any>(
 	{
-		name: {
+		user_name: {
 			type: String,
 			text: true,
 			trim: true,
+			index: { unique: true, sparse: true },
 			required: [true, 'نام الزامی است'],
 			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
 		},
-		mobile_number: { type: String, index: { unique: true, sparse: true }, required: [true, 'شماره همراه الزامی است'], },
-		status: { type: String, trim: true, default: 'جدید' },
-		website: { type: String, trim: true },
+		user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+		status: { type: String, trim: true, default: 'غیرفعال' },
 		title: { type: String, trim: true },
-		source: { type: String, trim: true },
+		roles: { type: String, trim: true },
+		teams: { type: Schema.Types.ObjectId, ref: 'Teams' },
+		type: { type: String, trim: true },
 		description: { type: String, trim: true },
-		expert: { type: Schema.Types.ObjectId, ref: 'Expert' },
-		address: { type: String, trim: true, },
-		email: { type: String, trim: true, },
-		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date } }],
-		call: [{ status: { type: String }, time: { type: Date } }],
+ 		email: { type: String, trim: true, },
+		leads: [{ type: Schema.Types.ObjectId, ref: 'Leads' }],
+		customers: [{ type: Schema.Types.ObjectId, ref: 'Customer' }],
+		lastActivity: { activity: { type: String }, time: { type: Date } },
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
@@ -31,7 +32,7 @@ const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
 	},
 )
 
-baseLeadSchema.method({
+baseExpertSchema.method({
 	softDelete: async function () {
 		this.mobile_number += '-deleted'
 		this.$isDeleted(true)
@@ -49,18 +50,18 @@ baseLeadSchema.method({
 })
 
 // calling methods
-baseLeadSchema.static('fillRandom', function () {
-	return `lead-${crypto.randomUUID().slice(0, 10)}`
+baseExpertSchema.static('fillRandom', function () {
+	return `expert-${crypto.randomUUID().slice(0, 10)}`
 })
 
 // calling hooks
 queriesForSoftDelete.forEach((type: any) => {
-	baseLeadSchema.pre(type, async function (next: any) {
+	baseExpertSchema.pre(type, async function (next: any) {
 		// @ts-ignore
 		this.where({ isDeleted: false })
 		next()
 	})
 })
 
-const Lead = models.Lead || model<ILead>('Lead', baseLeadSchema)
-export default Lead
+const Expert = models.Expert || model<IExpert>('Expert', baseExpertSchema)
+export default Expert

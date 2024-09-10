@@ -1,4 +1,15 @@
-import { Types } from 'mongoose'
+ import { Types } from 'mongoose'
+import { ObjectType } from 'react-date-object'
+
+interface ITeams {
+	name: string
+	status: string
+	description: string
+	parent?: Types.ObjectId
+	users?: [Types.ObjectId]
+	isDeleted?: boolean
+	deletedAt?: Date
+}
 
 interface ICategory {
 	name: string
@@ -15,16 +26,62 @@ interface IPCategory extends ICategory {
 	cat_type: string
 }
 
+interface IExpert {
+	user_id: Types.ObjectId
+	user_name: string
+ 	roles?: string
+	teams?: string
+	title?: string
+ 	email?: string
+	status?: string
+	type?: Types.ObjectId
+	description?: string
+	leads?: [Types.ObjectId]
+	customers?: [Types.ObjectId]
+	lastActivity: object
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
+interface ICustomer {
+	name: string
+	mobile_number: string
+	website?: string
+	title?: string
+	address?: string
+	expert?: Types.ObjectId
+	email?: string
+	status?: string
+	source?: string
+	convert?: object
+	description?: string
+	dialog?: string
+	call: string
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
 interface ILead {
 	name: string
 	mobile_number: string
-	province?: string
-	city?: string
+	website?: string
+	title?: string
 	address?: string
+	expert?: Types.ObjectId
 	email?: string
 	status?: string
+	source?: string
+	description?: string
 	dialog?: string
 	call: string
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
+interface IUser {
+	name: string
+	mobile_number: string
+	gender: string
 	isDeleted?: boolean
 	deletedAt?: Date
 }
@@ -111,11 +168,11 @@ interface IMeta {
 
 export type {
 	ICategory,
-	IMeta,
+	IMeta, ITeams,
 	IPCategory,
-	ILead,
-	IFile,
-	IOTP,
+	ILead, ICustomer,
+	IFile, IExpert,
+	IOTP, IUser,
 	IPage,
 	IProduct,
 	ITicket,

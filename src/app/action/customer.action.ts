@@ -3,43 +3,45 @@
 import Expert from '@/models/Expert'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
-import Lead from '@/models/Lead'
+import Customer from '@/models/Customer'
 import User from '@/models/User'
 
 /* ----- LEAD ----- */
-export const getLeads = async (search?: any) => {
+export const getCustomers = async (search?: any) => {
     await connect()
 
     try {
-        const allLeads = await Lead.find(buildQuery(search)).populate({ path: 'expert', populate: { path: 'user_id', model: User } })
+        const allCustomers = await Customer.find(buildQuery(search)).populate({ path: 'expert', populate: { path: 'user_id', model: User } })
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
             .lean()
 
-        return JSON.parse(JSON.stringify(allLeads))
+        return JSON.parse(JSON.stringify(allCustomers))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت پرسنل' }
     }
 }
 
-export const getSingleLead = async (id: string) => {
+export const getSingleCustomer = async (id: string) => {
     await connect()
 
     try {
-        const singleLead = await Lead.findById(id).populate([{ path: 'expert', model: Expert, populate: [{ path: 'user_id', model: User }] }])
-        return JSON.parse(JSON.stringify(singleLead))
+        const singleCustomer = await Customer.findById(id).populate([{ path: 'expert', model: Expert, populate: [{ path: 'user_id', model: User }] }])
+        return JSON.parse(JSON.stringify(singleCustomer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت کارمند' }
     }
 }
 
-export const createLead = async (body: any) => {
+export const createCustomer = async (body: any, convertor: any) => {
+    let time = Date.now()
+    body.convert = { convertor: convertor, time: time }
     await connect()
     try {
-        await Lead.create(body)
+        await Customer.create(body)
         return { success: true }
     } catch (error) {
         console.log(error)
@@ -47,11 +49,11 @@ export const createLead = async (body: any) => {
     }
 }
 
-export const editLead = async (id: string, body: any) => {
+export const editCustomer = async (id: string, body: any) => {
     await connect()
     try {
-        let updatedLead = await Lead.findByIdAndUpdate(id, body, { new: true })
-        return JSON.parse(JSON.stringify(updatedLead))
+        let updatedCustomer = await Customer.findByIdAndUpdate(id, body, { new: true })
+        return JSON.parse(JSON.stringify(updatedCustomer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -62,15 +64,15 @@ export const editDialog = async (id: string, body: any) => {
     await connect()
     let time = Date.now()
     try {
-        let lead = await Lead.findById(id)
-        for (let i = 0; i < lead.dialog.length; i++) {
-            if (lead.dialog[i]._id == body.dialogTextId) {
-                lead.dialog[i].text = body.text
-                lead.dialog[i].editedTime = time
-                await lead.save()
+        let customer = await Customer.findById(id)
+        for (let i = 0; i < customer.dialog.length; i++) {
+            if (customer.dialog[i]._id == body.dialogTextId) {
+                customer.dialog[i].text = body.text
+                customer.dialog[i].editedTime = time
+                await customer.save()
             }
         }
-        return JSON.parse(JSON.stringify(lead))
+        return JSON.parse(JSON.stringify(customer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -81,8 +83,8 @@ export const addDialog = async (id: string, body: any) => {
     let time = Date.now()
     let data = { text: body, time: time }
     try {
-        let updatedLead = await Lead.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
-        return JSON.parse(JSON.stringify(updatedLead))
+        let updatedCustomer = await Customer.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedCustomer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -94,19 +96,19 @@ export const addCallStatus = async (id: string, body: any) => {
     let time = Date.now()
     let data = { status: body, time: time }
     try {
-        let updatedLead = await Lead.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
-        return JSON.parse(JSON.stringify(updatedLead))
+        let updatedCustomer = await Customer.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedCustomer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
     }
 }
 
-export const deleteLead = async (leadId: string) => {
+export const deleteCustomer = async (customerId: string) => {
     await connect()
 
     try {
-        const found = await Lead.findById(leadId)
+        const found = await Customer.findById(customerId)
 
         if (!found) {
             return { error: 'مقاله وجود ندارد' }

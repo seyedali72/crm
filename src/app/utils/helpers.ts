@@ -168,10 +168,10 @@ export const sideItems = (leadType: string) => [
 	},
 	{
 		navId: 6,
-		navHead: 'کاربران',
+		navHead: 'پرسنل',
 		subNavItems: [
 			{
-				title: 'کاربران پنل',
+				title: 'پرسنل پنل',
 				path: `/pishkhan/leads/list`,
 				ban: ['customer'],
 			},
