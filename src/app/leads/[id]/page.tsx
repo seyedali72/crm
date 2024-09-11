@@ -81,11 +81,15 @@ export default function addDialogs() {
         router.replace('/leads')
     }
     const convertToCustomer = async () => {
-        await createCustomer(singleLead, '66e0756ac157ff0ef6b5ae50')
-        await deleteLead(singleLead?._id)
-        router.replace('/leads')
+        let data = singleLead
+        data.status = 'مشتری جدید'
+        let res = await createCustomer(data, '66e0756ac157ff0ef6b5ae50')
+        if (!res.error) {
+            await deleteLead(singleLead?._id)
+            router.replace('/leads')
+        }
     }
-     const changeStatus = async (type: string) => {
+    const changeStatus = async (type: string) => {
         let status = { status: type }
         let res = await editLead(singleLead?._id, status)
         if (!res.error) {
