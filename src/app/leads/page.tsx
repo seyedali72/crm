@@ -70,7 +70,7 @@ export default function Home() {
                       <td>{lead.status}</td>
                       <td>{lead.mobile_number}</td>
                       <td>{lead.call.length && lead.call.length}</td>
-                      <td><Link href={`/expert/${lead?.expert?._id}`}>{lead?.expert?.user_id?.name}</Link></td>
+                      <td><Link href={`/expert/${lead?.expert?._id}`}>{lead?.expert?.employe_id?.name}</Link></td>
                     </tr>)
                   }
                 })}

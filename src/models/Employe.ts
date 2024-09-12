@@ -1,9 +1,9 @@
 import { queriesForSoftDelete } from '@/app/utils/helpers'
-import { IUser } from '@/app/utils/types'
+import { IEmploye } from '@/app/utils/types'
 import crypto from 'crypto'
 import { Schema, model, Model, models } from 'mongoose'
 
-const baseUserSchema = new Schema<IUser, Model<IUser, any, any>, any>(
+const baseEmployeSchema = new Schema<IEmploye, Model<IEmploye, any, any>, any>(
 	{
 		name: {
 			type: String,
@@ -26,7 +26,7 @@ const baseUserSchema = new Schema<IUser, Model<IUser, any, any>, any>(
 	},
 )
 
-baseUserSchema.method({
+baseEmployeSchema.method({
 	softDelete: async function () {
 		this.mobile_number += '-deleted'
 		this.$isDeleted(true)
@@ -44,18 +44,18 @@ baseUserSchema.method({
 })
 
 // calling methods
-baseUserSchema.static('fillRandom', function () {
-	return `user-${crypto.randomUUID().slice(0, 10)}`
+baseEmployeSchema.static('fillRandom', function () {
+	return `employe-${crypto.randomUUID().slice(0, 10)}`
 })
 
 // calling hooks
 queriesForSoftDelete.forEach((type: any) => {
-	baseUserSchema.pre(type, async function (next: any) {
+	baseEmployeSchema.pre(type, async function (next: any) {
 		// @ts-ignore
 		this.where({ isDeleted: false })
 		next()
 	})
 })
 
-const User = models.User || model<IUser>('User', baseUserSchema)
-export default User
+const Employe = models.Employe || model<IEmploye>('Employe', baseEmployeSchema)
+export default Employe

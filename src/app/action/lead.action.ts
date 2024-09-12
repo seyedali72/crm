@@ -4,14 +4,14 @@ import Expert from '@/models/Expert'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Lead from '@/models/Lead'
-import User from '@/models/User'
-
+import Employe from '@/models/Employe'
+ 
 /* ----- LEAD ----- */
 export const getLeads = async (search?: any) => {
     await connect()
 
     try {
-        const allLeads = await Lead.find(buildQuery(search)).populate({ path: 'expert', populate: { path: 'user_id', model: User } })
+        const allLeads = await Lead.find(buildQuery(search)).populate({ path: 'expert', populate: { path: 'employe_id', model: Employe } })
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -28,7 +28,7 @@ export const getSingleLead = async (id: string) => {
     await connect()
 
     try {
-        const singleLead = await Lead.findById(id).populate([{ path: 'expert', model: Expert, populate: [{ path: 'user_id', model: User }] }])
+        const singleLead = await Lead.findById(id).populate([{ path: 'expert', model: Expert, populate: [{ path: 'employe_id', model: Employe }] }])
         return JSON.parse(JSON.stringify(singleLead))
     } catch (error) {
         console.log(error)

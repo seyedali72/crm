@@ -116,7 +116,7 @@ export default function addDialogs() {
                         </form>
                         {editInfo ? "" : <button type="button" onClick={() => setEditInfo(!editInfo)} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1199', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>درخواست ویرایش</button>}
                     </div>
-                    {singleCustomer?.expert !== undefined && <div>نام کارشناس: <Link href={`/expert/${singleCustomer?.expert?._id}`} > {singleCustomer?.expert?.user_id?.name}</Link></div>}
+                    {singleCustomer?.expert !== undefined && <div>نام کارشناس: <Link href={`/expert/${singleCustomer?.expert?._id}`} > {singleCustomer?.expert?.employe_id?.name}</Link></div>}
                     <div>
                         وضعیت: {singleCustomer?.status} | تغییر وضعیت به:
                         {singleCustomer?.status !== 'در حال بررسی' && <button type="button" onClick={() => changeStatus('در حال بررسی')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#17e9', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>درحال بررسی</button>}

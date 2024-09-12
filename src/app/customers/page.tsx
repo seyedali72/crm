@@ -33,7 +33,7 @@ export default function CustomersList() {
                                 <td>{customer.status}</td>
                                 <td>{customer.mobile_number}</td>
                                 <td>{customer.call.length && customer.call.length}</td>
-                                <td><Link href={`/expert/${customer?.expert?._id}`}>{customer?.expert?.user_id?.name}</Link></td>
+                                <td><Link href={`/expert/${customer?.expert?._id}`}>{customer?.expert?.employe_id?.name}</Link></td>
                             </tr>)
                         }
                     })}

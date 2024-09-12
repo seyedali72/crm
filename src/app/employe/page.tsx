@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createUser, getUsers } from '../action/usser.action'
+import { createEmploye, getEmployes } from '../action/employe.action'
  interface FormValues1 {
   name: string
   mobile_number: number 
@@ -10,15 +10,15 @@ import { createUser, getUsers } from '../action/usser.action'
 }
 export default function Home() {
   const { handleSubmit, register,setValue } = useForm<FormValues1>()
-  const [userList, setUserList] = useState([])
+  const [employeList, setEmployeList] = useState([])
   const [filter, setFilter] = useState('')
   const [mutated, setMutated] = useState(false)
   const fetchLeatList = useCallback(async () => {
-    let users = await getUsers({})
-    setUserList(users)
+    let employes = await getEmployes({})
+    setEmployeList(employes)
   }, [])
-  const handleCreateUser = async (obj: any) => {
-    let res = await createUser(obj)
+  const handleCreateEmploye = async (obj: any) => {
+    let res = await createEmploye(obj)
     if (!res.error) {
       setMutated(!mutated)
       setValue('name','')
@@ -35,7 +35,7 @@ export default function Home() {
     <div>
       <main>
         <div style={{ display: 'flex', width: '100%' }}>
-          <form style={{ width: '30%', padding: 10 }} action="post" onSubmit={handleSubmit(handleCreateUser)}>
+          <form style={{ width: '30%', padding: 10 }} action="post" onSubmit={handleSubmit(handleCreateEmploye)}>
             <h2 style={{ width: '100%', textAlign: 'start' }}>  افزودن کارمند </h2>
             <input type="text" style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} placeholder='نام و نام خانوادگی'	{...register('name', { required: 'نام کارمند را وارد کنید', })} />
             <input type="number" style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} placeholder='شماره موبایل'	{...register('mobile_number', { required: 'شماره تلفن را وارد کنید', })} />
@@ -54,12 +54,12 @@ export default function Home() {
                 <th>جنسیت</th> 
               </tr></thead>
               <tbody>
-                {userList.map((user: any,idx:number) => {
-                  if (user.name.includes(filter) || user.mobile_number.includes(filter)) {
+                {employeList.map((employe: any,idx:number) => {
+                  if (employe.name.includes(filter) || employe.mobile_number.includes(filter)) {
                     return (<tr key={idx}>
-                      <td style={{ textAlign: 'start' }}> <Link href={`/users/${user?._id}`} >{user.name}  </Link></td>
-                      <td>{user.mobile_number}</td> 
-                      <td>{user.gender}</td>
+                      <td style={{ textAlign: 'start' }}> <Link href={`/employes/${employe?._id}`} >{employe.name}  </Link></td>
+                      <td>{employe.mobile_number}</td> 
+                      <td>{employe.gender}</td>
                     </tr>)
                   }
                 })}

@@ -111,7 +111,7 @@ export default function addDialogs() {
             <>
                 {popup ? <div style={{ position: 'absolute', right: '25%', left: '25%', width: '50%', top: 200, backgroundColor: '#0003', padding: 15 }}>
                     <h3>کارشناس مورد نظر را انتخاب کنید</h3>
-                    <select onChange={(e: any) => setExpertId(e?.target?.value)} style={{ width: '90%' }} ><option value=''>کارشناس مورد نظر را انتخاب کنید</option>{expertsList?.map((expert: any, idx: number) => <option key={idx} value={expert?._id} >{expert?.user_id?.name}</option>)}</select>
+                    <select onChange={(e: any) => setExpertId(e?.target?.value)} style={{ width: '90%' }} ><option value=''>کارشناس مورد نظر را انتخاب کنید</option>{expertsList?.map((expert: any, idx: number) => <option key={idx} value={expert?._id} >{expert?.employe_id?.name}</option>)}</select>
                     <button disabled={expertId === ''} onClick={() => [toExpert(expertId), setPopup(false), setMutated(!mutated)]} type="button">تخصیص به کارشناس</button>
                 </div> : ''}
                 <h2 style={{ width: '100%', textAlign: 'center' }}>ثبت گزارش برای : {singleLead.name} {singleLead.mobile_number}</h2>
@@ -136,7 +136,7 @@ export default function addDialogs() {
                         </form>
                         {editInfo ? "" : <button type="button" onClick={() => setEditInfo(!editInfo)} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1199', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>درخواست ویرایش</button>}
                     </div>
-                    {singleLead?.expert !== undefined && <div>نام کارشناس: <Link href={`/expert/${singleLead?.expert?._id}`} > {singleLead?.expert?.user_id?.name}</Link></div>}
+                    {singleLead?.expert !== undefined && <div>نام کارشناس: <Link href={`/expert/${singleLead?.expert?._id}`} > {singleLead?.expert?.employe_id?.name}</Link></div>}
                     <div>
                         وضعیت: {singleLead?.status} | تغییر وضعیت به:
                         {singleLead?.status !== 'در حال بررسی' && <button type="button" onClick={() => changeStatus('در حال بررسی')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#17e9', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>درحال بررسی</button>}

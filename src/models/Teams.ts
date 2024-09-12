@@ -13,7 +13,7 @@ const baseTeamsSchema = new Schema<ITeams, Model<ITeams, any, any>, any>(
 			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
 		},
 		parent: { type: Schema.Types.ObjectId, ref: 'Teams' },
-		users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+		users: [{ type: Schema.Types.ObjectId, ref: 'Employe' }],
 		status: { type: String, trim: true, default: 'فعال' },
 		description: { type: String, trim: true },
 		isDeleted: { type: Boolean, required: true, default: false },

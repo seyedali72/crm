@@ -1,6 +1,5 @@
- import { Types } from 'mongoose'
-import { ObjectType } from 'react-date-object'
-
+  import { Types } from 'mongoose'
+ 
 interface ITeams {
 	name: string
 	status: string
@@ -27,7 +26,7 @@ interface IPCategory extends ICategory {
 }
 
 interface IExpert {
-	user_id: Types.ObjectId
+	employe_id: Types.ObjectId
 	user_name: string
  	roles?: string
 	teams?: string
@@ -78,7 +77,7 @@ interface ILead {
 	deletedAt?: Date
 }
 
-interface IUser {
+interface IEmploye {
 	name: string
 	mobile_number: string
 	gender: string
@@ -172,7 +171,7 @@ export type {
 	IPCategory,
 	ILead, ICustomer,
 	IFile, IExpert,
-	IOTP, IUser,
+	IOTP, IEmploye,
 	IPage,
 	IProduct,
 	ITicket,

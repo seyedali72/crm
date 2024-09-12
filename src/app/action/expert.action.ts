@@ -4,16 +4,16 @@ import { model } from 'mongoose';
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Expert from '@/models/Expert'
-import User from '@/models/User';
-import Teams from '@/models/Teams';
+ import Teams from '@/models/Teams';
 import Lead from '@/models/Lead';
+import Employe from '@/models/Employe';
 
 /* ----- LEAD ----- */
 export const getExperts = async (search?: any) => {
     await connect()
 
     try {
-        const allExperts = await Expert.find(buildQuery(search)).populate([{ path: 'user_id', model: User }, { path: 'teams', model: Teams }])
+        const allExperts = await Expert.find(buildQuery(search)).populate([{ path: 'employe_id', model: Employe }, { path: 'teams', model: Teams }])
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -30,7 +30,7 @@ export const getSingleExpert = async (id: string) => {
     await connect()
 
     try {
-        const singleExpert = await Expert.findById(id).populate([{ path: 'user_id', model: User }, { path: 'teams', model: Teams }, { path: 'leads', model: Lead }])
+        const singleExpert = await Expert.findById(id).populate([{ path: 'employe_id', model: Employe }, { path: 'teams', model: Teams }, { path: 'leads', model: Lead }])
         return JSON.parse(JSON.stringify(singleExpert))
     } catch (error) {
         console.log(error)

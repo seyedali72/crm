@@ -13,7 +13,7 @@ const baseExpertSchema = new Schema<IExpert, Model<IExpert, any, any>, any>(
 			required: [true, 'نام الزامی است'],
 			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
 		},
-		user_id: { type: Schema.Types.ObjectId, ref: 'User' },
+		employe_id: { type: Schema.Types.ObjectId, ref: 'Employe' },
 		status: { type: String, trim: true, default: 'غیرفعال' },
 		title: { type: String, trim: true },
 		roles: { type: String, trim: true },

@@ -4,8 +4,8 @@ import Teams from '@/models/Teams'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Expert from '@/models/Expert'
-import User from '@/models/User'
-
+import Employe from '@/models/Employe'
+ 
 /* ----- team ----- */
 export const getTeams = async (search?: any) => {
     await connect()
@@ -28,7 +28,7 @@ export const getSingleTeam = async (id: string) => {
     await connect()
 
     try {
-        const singleTeam = await Teams.findById(id).populate({ path: 'users', model: Expert, populate: [{ path: 'user_id', model: User }] })
+        const singleTeam = await Teams.findById(id).populate({ path: 'users', model: Expert, populate: [{ path: 'employe_id', model: Employe }] })
         return JSON.parse(JSON.stringify(singleTeam))
     } catch (error) {
         console.log(error)

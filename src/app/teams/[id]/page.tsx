@@ -27,6 +27,7 @@ export default function TeamDetail() {
     const handleEditTeams = async (obj: any) => {
         await editTeam(singleTeam?._id, obj)
     }
+    console.log(id)
     useEffect(() => { fetchTeamsList() }, [fetchTeamsList])
     if (singleTeam?.length !== 0) {
         return (
@@ -51,9 +52,9 @@ export default function TeamDetail() {
                         </tr></thead>
                         <tbody>
                             {singleTeam?.users.map((team: any, idx: number) => {
-                                if (team.user_id.name.includes(filter)) {
+                                if (team.employe_id.name.includes(filter)) {
                                     return (<tr key={idx}>
-                                        <td style={{ textAlign: 'start' }}> <Link href={`/teams/${team?._id}`} >{team?.user_id?.name}  </Link></td>
+                                        <td style={{ textAlign: 'start' }}> <Link href={`/teams/${team?._id}`} >{team?.employe_id?.name}  </Link></td>
                                         <td>{team.user_name}</td>
                                         <td>{team.title}</td>
                                         <td>{team.type}</td>

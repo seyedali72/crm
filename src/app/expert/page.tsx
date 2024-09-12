@@ -2,9 +2,9 @@
 import { useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getUsers } from '../action/usser.action'
-import { createExpert, getExperts } from '../action/expert.action'
+ import { createExpert, getExperts } from '../action/expert.action'
 import { getTeams } from '../action/teams.action'
+import { getEmployes } from '../action/employe.action'
 interface FormValues1 {
     user_name: string
     title: string
@@ -18,17 +18,17 @@ export default function Home() {
     const { handleSubmit, register,setValue } = useForm<FormValues1>()
     const [expertsList, setExpertsList] = useState([])
     const [teamsList, setTeamsList] = useState([])
-    const [userList, setUserList] = useState([])
+    const [EmployesList, setEmployesList] = useState([])
     const [filter, setFilter] = useState('')
     const [userId, setUserId] = useState<any>()
     const [teamId, setTeamId] = useState<any>()
     const [mutated, setMutated] = useState(false)
 
-    const fetchUserList = useCallback(async () => {
-        let users = await getUsers({})
+    const fetchEmployesList = useCallback(async () => {
+        let employes = await getEmployes({})
         let experts = await getExperts({})
         setExpertsList(experts)
-        setUserList(users)
+        setEmployesList(employes)
     }, [])
     const fetchTeamsList = useCallback(async () => {
         let teams = await getTeams({})
@@ -36,7 +36,7 @@ export default function Home() {
     }, [])
     const handleCreateExpert = async (obj: any) => {
         if (userId !== undefined && teamId !== undefined) {
-            obj.user_id = userId
+            obj.employe_id = userId
             obj.teams = teamId
             let res = await createExpert(obj)
             if (!res.error) {
@@ -53,15 +53,15 @@ export default function Home() {
             }
         } else { console.log('nashod') }
     }
-    const userChanged = expertsList?.map((ex: any) => ex?.user_id?._id)
+    const userChanged = expertsList?.map((ex: any) => ex?.employe_id?._id)
     const checkedUser = (userId: any) => {
         if (userChanged?.includes(userId)) { return false } else { return true }
     }
     useEffect(() => {
-        fetchUserList()
+        fetchEmployesList()
         fetchTeamsList()
-    }, [fetchUserList, mutated])
-
+    }, [fetchEmployesList, mutated])
+console.log(expertsList)
     return (
         <div>
             <main>
@@ -69,7 +69,7 @@ export default function Home() {
                     <form style={{ width: '30%', padding: 10 }} action="post" onSubmit={handleSubmit(handleCreateExpert)}>
                         <h2 style={{ width: '100%', textAlign: 'start' }}>  افزودن کارشناس </h2>
                         <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setUserId(e.target.value)}><option  value=''>کاربر را انتخاب کنید</option>
-                            {userList?.map((user: any, idx: number) => { if (checkedUser(user?._id)) { return (<option key={idx} value={user?._id}>{user?.name}</option>) } })}
+                            {EmployesList?.map((user: any, idx: number) => { if (checkedUser(user?._id)) { return (<option key={idx} value={user?._id}>{user?.name}</option>) } })}
                         </select>
                         <input type="text" style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} placeholder='نام کاربری  '	{...register('user_name')} />
                         <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setTeamId(e.target.value)}><option  value=''>تیم را انتخاب کنید</option>
@@ -99,11 +99,11 @@ export default function Home() {
                             </tr></thead>
                             <tbody>
                                 {expertsList.map((expert: any, idx: number) => {
-                                    if (expert?.user_id?.name.includes(filter) || expert?.user_id?.mobile_number.includes(filter)) {
+                                    if (expert?.employe_id?.name.includes(filter) || expert?.employe_id?.mobile_number.includes(filter)) {
                                         return (<tr key={idx}>
-                                            <td style={{ textAlign: 'start' }}> <Link href={`/expert/${expert?._id}`} >{expert?.user_id?.name}  </Link></td>
+                                            <td style={{ textAlign: 'start' }}> <Link href={`/expert/${expert?._id}`} >{expert?.employe_id?.name}  </Link></td>
                                             <td>{expert.status}</td>
-                                            <td>{expert.user_id?.mobile_number}</td>
+                                            <td>{expert.employe_id?.mobile_number}</td>
                                             <td>{expert?.teams?.name}</td>
                                             <td>{expert?.leads?.length}</td>
                                             <td>{expert?.customers?.length}</td>

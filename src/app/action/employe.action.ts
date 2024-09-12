@@ -1,43 +1,43 @@
 'use server'
 
+import Employe from '@/models/Employe'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
-import User from '@/models/User'
-
+ 
 /* ----- LEAD ----- */
-export const getUsers = async (search?: any) => {
+export const getEmployes = async (search?: any) => {
     await connect()
 
     try {
-        const allUsers = await User.find(buildQuery(search))
+        const allEmployes = await Employe.find(buildQuery(search))
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
             .lean()
 
-        return JSON.parse(JSON.stringify(allUsers))
+        return JSON.parse(JSON.stringify(allEmployes))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت پرسنل' }
     }
 }
 
-export const getSingleUser = async (id: string) => {
+export const getSingleEmploye = async (id: string) => {
     await connect()
 
     try {
-        const singleUser = await User.findById(id)
-        return JSON.parse(JSON.stringify(singleUser))
+        const singleEmploye = await Employe.findById(id)
+        return JSON.parse(JSON.stringify(singleEmploye))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت کارمند' }
     }
 }
 
-export const createUser = async (body: any) => {
+export const createEmploye = async (body: any) => {
     await connect()
     try {
-        await User.create(body)
+        await Employe.create(body)
         return { success: true }
     } catch (error) {
         console.log(error)
@@ -45,11 +45,11 @@ export const createUser = async (body: any) => {
     }
 }
 
-export const editUser = async (id: string, body: any) => {
+export const editEmploye = async (id: string, body: any) => {
     await connect()
     try {
-        let updatedUser = await User.findByIdAndUpdate(id, body, { new: true })
-        return JSON.parse(JSON.stringify(updatedUser))
+        let updatedEmploye = await Employe.findByIdAndUpdate(id, body, { new: true })
+        return JSON.parse(JSON.stringify(updatedEmploye))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -59,15 +59,15 @@ export const editDialog = async (id: string, body: any) => {
     await connect()
     let time = Date.now()
     try {
-        let user = await User.findById(id)
-        for (let i = 0; i < user.dialog.length; i++) {
-            if (user.dialog[i]._id == body.dialogTextId) {
-                user.dialog[i].text = body.text
-                user.dialog[i].editedTime = time
-                await user.save()
+        let employe = await Employe.findById(id)
+        for (let i = 0; i < employe.dialog.length; i++) {
+            if (employe.dialog[i]._id == body.dialogTextId) {
+                employe.dialog[i].text = body.text
+                employe.dialog[i].editedTime = time
+                await employe.save()
             }
         }
-        return JSON.parse(JSON.stringify(user))
+        return JSON.parse(JSON.stringify(employe))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -78,8 +78,8 @@ export const addDialog = async (id: string, body: any) => {
     let time = Date.now()
     let data = { text: body, time: time }
     try {
-        let updatedUser = await User.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
-        return JSON.parse(JSON.stringify(updatedUser))
+        let updatedEmploye = await Employe.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedEmploye))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -90,18 +90,18 @@ export const addCallStatus = async (id: string, body: any) => {
     let time = Date.now()
     let data = { status: body, time: time }
     try {
-        let updatedUser = await User.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
-        return JSON.parse(JSON.stringify(updatedUser))
+        let updatedEmploye = await Employe.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedEmploye))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
     }
 }
-export const deleteUser = async (userId: string) => {
+export const deleteEmploye = async (employeId: string) => {
     await connect()
 
     try {
-        const found = await User.findById(userId)
+        const found = await Employe.findById(employeId)
 
         if (!found) {
             return { error: 'مقاله وجود ندارد' }
