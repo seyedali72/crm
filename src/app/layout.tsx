@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import Providers from "./components/Providers";
 
 
 export const metadata: Metadata = {
@@ -14,17 +15,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body style={{  padding: 15 }} >
-        <ul style={{display:'flex', gap:25, padding:10}}>
-          <Link href={`/`}><li>خانه</li></Link>
-          <Link href={`/employe`}><li>پرسنل</li></Link>
-          <Link href={`/expert`}><li>کارشناس ها</li></Link>
-          <Link href={`/teams`}><li>تیم ها</li></Link>
-          <Link href={`/leads`}><li>سرنخ ها</li></Link>
-          <Link href={`/customers`}><li>مشتریان ها</li></Link>
-        </ul>
-        {children}</body>
-    </html>
+    <Providers>
+      <html lang="en">
+        <body style={{ padding: 15 }} >
+          <ul style={{ display: 'flex', gap: 25, padding: 10 }}>
+            <Link href={`/`}><li>خانه</li></Link>
+            <Link href={`/employe`}><li>پرسنل</li></Link>
+            <Link href={`/expert`}><li>کارشناس ها</li></Link>
+            <Link href={`/teams`}><li>تیم ها</li></Link>
+            <Link href={`/customers/categories`}><li>زمینه فعالیت مشتریان</li></Link>
+            <Link href={`/leads`}><li>سرنخ ها</li></Link>
+            <Link href={`/customers`}><li>مشتریان ها</li></Link>
+          </ul>
+          {children}</body>
+      </html>
+    </Providers>
   );
 }

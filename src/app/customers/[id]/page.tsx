@@ -1,8 +1,8 @@
 'use client'
 
 import { createCustomer, getSingleCustomer } from "@/app/action/customer.action"
- import { addCallStatus, addDialog, deleteCustomer, editDialog, editCustomer } from "@/app/action/customer.action"
-import { addCustomerToExpert } from "@/app/action/expert.action"
+import { addCallStatus, addDialog, deleteCustomer, editDialog, editCustomer } from "@/app/action/customer.action"
+import { addCustomerToExpert, getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -29,12 +29,16 @@ export default function addDialogs() {
     const [dialogId, setDialogId] = useState('')
     const [dialogText, setDialogText] = useState('')
     const [singleCustomer, setSingleCustomer] = useState<any>([])
-    const [deletedCheck, setDeletedCheck] = useState(false)
+    const [popup, setPopup] = useState(false)
+    const [expertsList, setExpertList] = useState<any>([])
+    const [expertId, setExpertId] = useState('')
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
     const customer = useCallback(async () => {
         let customer = await getSingleCustomer(id)
-        customer.isDeleted === false ? setSingleCustomer(customer) : setDeletedCheck(true)
+        setSingleCustomer(customer)
+        let experts = await getExperts({ isDeleted: false })
+        setExpertList(experts)
     }, [])
     useEffect(() => {
         customer()
@@ -44,12 +48,13 @@ export default function addDialogs() {
         await addCallStatus(singleCustomer?._id, obj)
         setMutated(!mutated)
     }
-    const { handleSubmit, register, setValue } = useForm<FormValues>()
-    const { handleSubmit: handleSubmit2, register: register2, } = useForm<FormValues2>({ values: { text: dialogText } })
+    const { handleSubmit, register, reset } = useForm<FormValues>()
+    const { handleSubmit: handleSubmit2, register: register2, reset: reset2 } = useForm<FormValues2>({ values: { text: dialogText } })
+
     const handleCreateDialog = async (obj: any) => {
         let res = await addDialog(singleCustomer?._id, obj.text)
         if (!res?.error) {
-            setValue('text', '')
+            reset()
             setMutated(!mutated)
         }
     }
@@ -59,7 +64,7 @@ export default function addDialogs() {
         setDialogId('')
         setMutated(!mutated)
     }
-    const { handleSubmit: handleSubmit3, register: register3 } = useForm<FormValues3>({ values: { name: singleCustomer?.name, mobile_number: singleCustomer?.mobile_number, email: singleCustomer?.email, website: singleCustomer?.website, title: singleCustomer?.title, address: singleCustomer?.address, source: singleCustomer?.source, description: singleCustomer?.description } })
+    const { handleSubmit: handleSubmit3, register: register3, reset: reset3 } = useForm<FormValues3>({ values: { name: singleCustomer?.name, mobile_number: singleCustomer?.mobile_number, email: singleCustomer?.email, website: singleCustomer?.website, title: singleCustomer?.title, address: singleCustomer?.address, source: singleCustomer?.source, description: singleCustomer?.description } })
     const handleEditCustomer = async (obj: any) => {
         let res = await editCustomer(singleCustomer?._id, obj)
         if (!res.error) {
@@ -69,11 +74,14 @@ export default function addDialogs() {
         }
         setEditInfo(false)
     }
-    const toExpert = async () => {
-        await addCustomerToExpert(singleCustomer?._id, '66df45492fb20a02ef105996')
-        await editCustomer(singleCustomer?._id, { expert: '66df45492fb20a02ef105996' })
+
+
+    const changeExpert = async () => {
+        await removeCustomerFromExpert(singleCustomer?._id, singleCustomer?.expert?._id)
+        await addCustomerToExpert(singleCustomer?._id, expertId)
+        await editCustomer(singleCustomer?._id, { expert: expertId })
     }
-  
+
     const changeStatus = async (type: string) => {
         let status = { status: type }
         let res = await editCustomer(singleCustomer?._id, status)
@@ -88,12 +96,15 @@ export default function addDialogs() {
     let successCall = singleCustomer?.call?.filter((el: any) => el.status == 'تماس موفق')
     let brokenCall = singleCustomer?.call?.filter((el: any) => el.status == 'تماس بی پاسخ')
     let offCall = singleCustomer?.call?.filter((el: any) => el.status == 'دردسترس نبود')
-    if (deletedCheck) {
-        return <p>این سرنخ حذف یا تبدیل گردیده است</p>
-    }
+
     if (singleCustomer?.length !== 0) {
         return (
             <>
+                {popup ? <div style={{ position: 'absolute', right: '25%', left: '25%', width: '50%', top: 200, backgroundColor: '#0003', padding: 15 }}>
+                    <h3>کارشناس مورد نظر را انتخاب کنید</h3>
+                    <select onChange={(e: any) => setExpertId(e?.target?.value)} style={{ width: '90%' }} ><option value=''>کارشناس مورد نظر را انتخاب کنید</option>{expertsList?.map((expert: any, idx: number) => <option key={idx} value={expert?._id} >{expert?.employe_id?.name}</option>)}</select>
+                    <button disabled={expertId === ''} onClick={() => [changeExpert(), setPopup(false), setMutated(!mutated)]} type="button">تخصیص به کارشناس</button>
+                </div> : ''}
                 <h2 style={{ width: '100%', textAlign: 'center' }}>ثبت گزارش برای : {singleCustomer.name} {singleCustomer.mobile_number}</h2>
                 <div style={{ width: '100%', }}>
                     <div style={{ width: '100%', padding: 10 }}>
@@ -123,8 +134,8 @@ export default function addDialogs() {
                         {singleCustomer?.status !== 'نامرتبط' && <button type="button" onClick={() => changeStatus('نامرتبط')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1919', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>نامرتبط</button>}
                         {singleCustomer?.status !== 'از دست رفته' && <button type="button" onClick={() => changeStatus('از دست رفته')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1719', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>از دست رفته</button>}
                         {singleCustomer?.status !== 'بازیابی شده' && <button type="button" onClick={() => changeStatus('بازیابی شده')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#46a9', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>بازیابی شده</button>}
-                        {singleCustomer?.expert === undefined && <button type="button" onClick={() => toExpert()} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1859', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>تغییر کارشناس</button>}
-                     </div>
+                        <button type="button" onClick={() => setPopup(true)} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1859', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>تغییر کارشناس</button>
+                    </div>
                     <div>تماس :
                         <button type="button" onClick={() => handleCallStatus('تماس موفق')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#1e19', border: 'unset', borderRadius: 5, color: '#000', fontSize: 14, cursor: 'pointer' }}>تماس گرفته شد</button>
                         <button type="button" onClick={() => handleCallStatus('تماس بی پاسخ')} style={{ margin: 10, padding: '5px 20px', backgroundColor: '#19b9', border: 'unset', borderRadius: 5, color: '#000', fontSize: 14, cursor: 'pointer' }}>تماس بی پاسخ</button>

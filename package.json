@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "@types/js-cookie": "^3.0.6",
+    "bootstrap": "^5.3.3",
     "js-cookie": "^3.0.5",
     "mongoose": "^8.6.0",
     "next": "14.2.5",

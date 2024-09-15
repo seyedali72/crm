@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
- import { createExpert, getExperts } from '../action/expert.action'
+import { createExpert, getExperts } from '../action/expert.action'
 import { getTeams } from '../action/teams.action'
 import { getEmployes } from '../action/employe.action'
 interface FormValues1 {
@@ -15,7 +15,7 @@ interface FormValues1 {
     email: string
 }
 export default function Home() {
-    const { handleSubmit, register,setValue } = useForm<FormValues1>()
+    const { handleSubmit, register, reset } = useForm<FormValues1>()
     const [expertsList, setExpertsList] = useState([])
     const [teamsList, setTeamsList] = useState([])
     const [EmployesList, setEmployesList] = useState([])
@@ -34,20 +34,16 @@ export default function Home() {
         let teams = await getTeams({})
         setTeamsList(teams)
     }, [])
+
     const handleCreateExpert = async (obj: any) => {
+        obj.password = obj.user_name
         if (userId !== undefined && teamId !== undefined) {
             obj.employe_id = userId
             obj.teams = teamId
             let res = await createExpert(obj)
             if (!res.error) {
                 setMutated(!mutated)
-                setValue('description','')
-                setValue('email','')
-                setValue('roles','')
-                setValue('status','')
-                setValue('title','')
-                setValue('type','')
-                setValue('user_name','')
+                reset()
             } else {
                 console.log('ridi')
             }
@@ -61,18 +57,18 @@ export default function Home() {
         fetchEmployesList()
         fetchTeamsList()
     }, [fetchEmployesList, mutated])
-console.log(expertsList)
+
     return (
         <div>
             <main>
                 <div style={{ display: 'flex', width: '100%' }}>
                     <form style={{ width: '30%', padding: 10 }} action="post" onSubmit={handleSubmit(handleCreateExpert)}>
                         <h2 style={{ width: '100%', textAlign: 'start' }}>  افزودن کارشناس </h2>
-                        <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setUserId(e.target.value)}><option  value=''>کاربر را انتخاب کنید</option>
+                        <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setUserId(e.target.value)}><option value=''>کاربر را انتخاب کنید</option>
                             {EmployesList?.map((user: any, idx: number) => { if (checkedUser(user?._id)) { return (<option key={idx} value={user?._id}>{user?.name}</option>) } })}
                         </select>
                         <input type="text" style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} placeholder='نام کاربری  '	{...register('user_name')} />
-                        <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setTeamId(e.target.value)}><option  value=''>تیم را انتخاب کنید</option>
+                        <select style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} onChange={(e: any) => setTeamId(e.target.value)}><option value=''>تیم را انتخاب کنید</option>
                             {teamsList?.map((team: any, idx: number) => { return (<option key={idx} value={team?._id}>{team?.name}</option>) })}
                         </select>
                         <input type="email" style={{ display: 'block', width: '90%', margin: '10px 0', padding: '5px 15px' }} placeholder='ایمیل  '	{...register('email')} />
@@ -92,18 +88,18 @@ console.log(expertsList)
                             <thead><tr>
                                 <th>نام و فامیلی</th>
                                 <th>وضعیت</th>
-                                <th>شماره موبایل</th>
+                                <th>شماره ملی</th>
                                 <th>تیم</th>
                                 <th>سرنخ ها</th>
                                 <th>مشتریان</th>
                             </tr></thead>
                             <tbody>
                                 {expertsList.map((expert: any, idx: number) => {
-                                    if (expert?.employe_id?.name.includes(filter) || expert?.employe_id?.mobile_number.includes(filter)) {
+                                    if (expert?.employe_id?.name.includes(filter) || expert?.employe_id?.national_code.includes(filter)) {
                                         return (<tr key={idx}>
                                             <td style={{ textAlign: 'start' }}> <Link href={`/expert/${expert?._id}`} >{expert?.employe_id?.name}  </Link></td>
                                             <td>{expert.status}</td>
-                                            <td>{expert.employe_id?.mobile_number}</td>
+                                            <td>{expert.employe_id?.national_code}</td>
                                             <td>{expert?.teams?.name}</td>
                                             <td>{expert?.leads?.length}</td>
                                             <td>{expert?.customers?.length}</td>

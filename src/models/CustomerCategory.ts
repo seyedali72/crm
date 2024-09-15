@@ -1,9 +1,9 @@
 import { queriesForSoftDelete } from '@/app/utils/helpers'
-import { IEmploye } from '@/app/utils/types'
+import { ICustomerCat } from '@/app/utils/types'
 import crypto from 'crypto'
 import { Schema, model, Model, models } from 'mongoose'
 
-const baseEmployeSchema = new Schema<IEmploye, Model<IEmploye, any, any>, any>(
+const baseCustomerCatSchema = new Schema<ICustomerCat, Model<ICustomerCat, any, any>, any>(
 	{
 		name: {
 			type: String,
@@ -12,13 +12,11 @@ const baseEmployeSchema = new Schema<IEmploye, Model<IEmploye, any, any>, any>(
 			required: [true, 'نام الزامی است'],
 			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
 		},
-		national_code: {
-			type: String,
-			index: { unique: true, sparse: true },
-			required: [true, 'شماره همراه الزامی است'],
-		},
-		gender: { type: String, trim: true },
- 		isDeleted: { type: Boolean, required: true, default: false },
+		parent: { type: Schema.Types.ObjectId, ref: 'CustomerCat' },
+		users: [{ type: Schema.Types.ObjectId, ref: 'Employe' }],
+		status: { type: String, trim: true, default: 'فعال' },
+		description: { type: String, trim: true },
+		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
 	{
@@ -26,7 +24,7 @@ const baseEmployeSchema = new Schema<IEmploye, Model<IEmploye, any, any>, any>(
 	},
 )
 
-baseEmployeSchema.method({
+baseCustomerCatSchema.method({
 	softDelete: async function () {
 		this.mobile_number += '-deleted'
 		this.$isDeleted(true)
@@ -44,18 +42,18 @@ baseEmployeSchema.method({
 })
 
 // calling methods
-baseEmployeSchema.static('fillRandom', function () {
-	return `employe-${crypto.randomUUID().slice(0, 10)}`
+baseCustomerCatSchema.static('fillRandom', function () {
+	return `customerCat-${crypto.randomUUID().slice(0, 10)}`
 })
 
 // calling hooks
 queriesForSoftDelete.forEach((type: any) => {
-	baseEmployeSchema.pre(type, async function (next: any) {
+	baseCustomerCatSchema.pre(type, async function (next: any) {
 		// @ts-ignore
 		this.where({ isDeleted: false })
 		next()
 	})
 })
 
-const Employe = models.Employe || model<IEmploye>('Employe', baseEmployeSchema)
-export default Employe
+const CustomerCat = models.CustomerCat || model<ICustomerCat>('CustomerCat', baseCustomerCatSchema)
+export default CustomerCat

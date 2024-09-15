@@ -27,7 +27,7 @@ export default function TeamDetail() {
     const handleEditTeams = async (obj: any) => {
         await editTeam(singleTeam?._id, obj)
     }
-    console.log(id)
+
     useEffect(() => { fetchTeamsList() }, [fetchTeamsList])
     if (singleTeam?.length !== 0) {
         return (

@@ -1,5 +1,15 @@
-  import { Types } from 'mongoose'
- 
+import { Types } from 'mongoose'
+
+interface ICustomerCat {
+	name: string
+	status: string
+	description: string
+	parent?: Types.ObjectId
+	users?: [Types.ObjectId]
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
 interface ITeams {
 	name: string
 	status: string
@@ -21,23 +31,35 @@ interface ICategory {
 	deletedAt?: Date
 }
 
-interface IPCategory extends ICategory {
-	cat_type: string
+interface IClient extends IUser {
+	mobile_number: number
 }
 
 interface IExpert {
 	employe_id: Types.ObjectId
 	user_name: string
- 	roles?: string
+	password: string
+	role:number
+	roles?: string
 	teams?: string
 	title?: string
- 	email?: string
+	email?: string
 	status?: string
 	type?: Types.ObjectId
 	description?: string
 	leads?: [Types.ObjectId]
 	customers?: [Types.ObjectId]
 	lastActivity: object
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
+interface IUser {
+	name: string
+	user_name: string
+	password: string
+	role?: string
+	email?: string
 	isDeleted?: boolean
 	deletedAt?: Date
 }
@@ -55,6 +77,7 @@ interface ICustomer {
 	convert?: object
 	description?: string
 	dialog?: string
+	edits?: string[]
 	call: string
 	isDeleted?: boolean
 	deletedAt?: Date
@@ -67,19 +90,21 @@ interface ILead {
 	title?: string
 	address?: string
 	expert?: Types.ObjectId
+	creator: Types.ObjectId
 	email?: string
 	status?: string
 	source?: string
 	description?: string
-	dialog?: string
-	call: string
+	dialog?: string[]
+	call?: string[]
+	edits?: string[]
 	isDeleted?: boolean
 	deletedAt?: Date
 }
 
 interface IEmploye {
 	name: string
-	mobile_number: string
+	national_code: string
 	gender: string
 	isDeleted?: boolean
 	deletedAt?: Date
@@ -166,9 +191,9 @@ interface IMeta {
 }
 
 export type {
-	ICategory,
+	ICategory,ICustomerCat,
 	IMeta, ITeams,
-	IPCategory,
+	IClient, IUser,
 	ILead, ICustomer,
 	IFile, IExpert,
 	IOTP, IEmploye,

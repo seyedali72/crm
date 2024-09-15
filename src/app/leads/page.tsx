@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createLead, getLeads } from '../action/lead.action'
+import { useUser } from '../context/UserProvider'
 interface FormValues1 {
   name: string
   mobile_number: number
@@ -14,18 +15,22 @@ interface FormValues1 {
   email: string
 }
 export default function Home() {
-  const { handleSubmit, register, } = useForm<FormValues1>()
+  const { handleSubmit, register, reset } = useForm<FormValues1>()
   const [leadList, setLeadList] = useState([])
   const [filter, setFilter] = useState('')
   const [mutated, setMutated] = useState(false)
+  const { user } = useUser()
   const fetchLeatList = useCallback(async () => {
-    let leads = await getLeads({isDeleted: false})
+    let leads = await getLeads({ isDeleted: false })
     setLeadList(leads)
   }, [])
   const handleCreateLead = async (obj: any) => {
+    obj.creator = user?._id
+
     let res = await createLead(obj)
     if (!res.error) {
       setMutated(!mutated)
+      reset()
     } else {
       console.log('ridi')
     }
@@ -63,8 +68,8 @@ export default function Home() {
                 <th>کارشناس</th>
               </tr></thead>
               <tbody>
-                {leadList.map((lead: any,idx:number) => {
-                   if (lead.name.includes(filter) || lead.mobile_number.includes(filter)) {
+                {leadList.map((lead: any, idx: number) => {
+                  if (lead.name.includes(filter) || lead.mobile_number.includes(filter)) {
                     return (<tr key={idx}>
                       <td style={{ textAlign: 'start' }}> <Link href={`/leads/${lead?._id}`} >{lead.name}  </Link></td>
                       <td>{lead.status}</td>

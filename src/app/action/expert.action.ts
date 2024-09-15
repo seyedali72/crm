@@ -4,7 +4,7 @@ import { model } from 'mongoose';
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Expert from '@/models/Expert'
- import Teams from '@/models/Teams';
+import Teams from '@/models/Teams';
 import Lead from '@/models/Lead';
 import Employe from '@/models/Employe';
 
@@ -83,7 +83,18 @@ export const addLeadToExpert = async (id: string, expertId: string) => {
 
     try {
         let updatedExpert = await Expert.findByIdAndUpdate(expertId, { $push: { leads: id } }, { new: true })
-         return JSON.parse(JSON.stringify(updatedExpert))
+        return JSON.parse(JSON.stringify(updatedExpert))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+export const deleteLeadFromExpert = async (id: string, expertId: string) => {
+    await connect()
+
+    try {
+        let updatedExpert = await Expert.findByIdAndUpdate(expertId, { $pull: { leads: id } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedExpert))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
@@ -91,9 +102,21 @@ export const addLeadToExpert = async (id: string, expertId: string) => {
 }
 export const addCustomerToExpert = async (id: string, expertId: string) => {
     await connect()
-
+    console.log(id, 'id', expertId, 'expertId')
     try {
         let updatedExpert = await Expert.findByIdAndUpdate(expertId, { $push: { customers: id } }, { new: true })
+        console.log(updatedExpert)
+        return JSON.parse(JSON.stringify(updatedExpert))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+export const removeCustomerFromExpert = async (id: string, expertId: any) => {
+    await connect()
+
+    try {
+        let updatedExpert = await Expert.findByIdAndUpdate(expertId, { $pull: { customers: id } }, { new: true })
         return JSON.parse(JSON.stringify(updatedExpert))
     } catch (error) {
         console.log(error)

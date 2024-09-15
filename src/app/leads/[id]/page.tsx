@@ -1,8 +1,9 @@
 'use client'
 
 import { createCustomer } from "@/app/action/customer.action"
-import { addLeadToExpert, getExperts } from "@/app/action/expert.action"
+import { addCustomerToExpert, addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
 import { addCallStatus, addDialog, deleteLead, editDialog, editLead, getSingleLead } from "@/app/action/lead.action"
+import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -47,27 +48,27 @@ export default function addDialogs() {
     }, [lead, mutated])
 
     const handleCallStatus = async (obj: any) => {
-        await addCallStatus(singleLead?._id, obj)
+        await addCallStatus(singleLead?._id, obj, singleLead?.expert?._id)
         setMutated(!mutated)
     }
-    const { handleSubmit, register, setValue } = useForm<FormValues>()
+    const { handleSubmit, register, reset } = useForm<FormValues>()
     const { handleSubmit: handleSubmit2, register: register2, } = useForm<FormValues2>({ values: { text: dialogText } })
     const handleCreateDialog = async (obj: any) => {
-        let res = await addDialog(singleLead?._id, obj.text)
+        let res = await addDialog(singleLead?._id, obj.text, singleLead?.expert?._id)
         if (!res?.error) {
-            setValue('text', '')
+            reset()
             setMutated(!mutated)
         }
     }
     const handleEditDialog = async (obj: any) => {
         let data = { text: obj.text, dialogTextId: dialogId, }
-        await editDialog(singleLead?._id, data)
+        await editDialog(singleLead?._id, data, singleLead?.expert?._id)
         setDialogId('')
         setMutated(!mutated)
     }
     const { handleSubmit: handleSubmit3, register: register3 } = useForm<FormValues3>({ values: { name: singleLead?.name, mobile_number: singleLead?.mobile_number, email: singleLead?.email, website: singleLead?.website, title: singleLead?.title, address: singleLead?.address, source: singleLead?.source, description: singleLead?.description } })
     const handleEditLead = async (obj: any) => {
-        let res = await editLead(singleLead?._id, obj)
+        let res = await editLead(singleLead?._id, obj,user?._id)
         if (!res.error) {
             setMutated(!mutated)
         } else {
@@ -77,21 +78,24 @@ export default function addDialogs() {
     }
     const toExpert = async (expertId: any) => {
         await addLeadToExpert(singleLead?._id, expertId)
-        await editLead(singleLead?._id, { expert: expertId })
+        await editLead(singleLead?._id, { expert: expertId },user?._id)
         router.replace('/leads')
     }
+  const { user } = useUser()
     const convertToCustomer = async () => {
         let data = singleLead
         data.status = 'مشتری جدید'
-        let res = await createCustomer(data, '66e0756ac157ff0ef6b5ae50')
-        if (!res.error) {
+        let res = await createCustomer(data, user?._id)
+        if (res?._id !== undefined) {
             await deleteLead(singleLead?._id)
+            await addCustomerToExpert(res?._id,singleLead?.expert?._id)
+            await deleteLeadFromExpert(singleLead?._id, singleLead?.expert?._id)
             router.replace('/leads')
         }
     }
     const changeStatus = async (type: string) => {
         let status = { status: type }
-        let res = await editLead(singleLead?._id, status)
+        let res = await editLead(singleLead?._id, status,user?._id)
         if (!res.error) {
             setMutated(!mutated)
         } else {

@@ -5,7 +5,7 @@ import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Lead from '@/models/Lead'
 import Employe from '@/models/Employe'
- 
+
 /* ----- LEAD ----- */
 export const getLeads = async (search?: any) => {
     await connect()
@@ -47,10 +47,11 @@ export const createLead = async (body: any) => {
     }
 }
 
-export const editLead = async (id: string, body: any) => {
+export const editLead = async (id: string, body: any, editor: string) => {
     await connect()
+    let time = Date.now()
     try {
-        let updatedLead = await Lead.findByIdAndUpdate(id, body, { new: true })
+        let updatedLead = await Lead.findByIdAndUpdate(id, { ...body, $push: { edits: { time, editor } } }, { new: true })
         return JSON.parse(JSON.stringify(updatedLead))
     } catch (error) {
         console.log(error)
@@ -58,7 +59,7 @@ export const editLead = async (id: string, body: any) => {
     }
 }
 
-export const editDialog = async (id: string, body: any) => {
+export const editDialog = async (id: string, body: any, expertId: string) => {
     await connect()
     let time = Date.now()
     try {
@@ -67,6 +68,7 @@ export const editDialog = async (id: string, body: any) => {
             if (lead.dialog[i]._id == body.dialogTextId) {
                 lead.dialog[i].text = body.text
                 lead.dialog[i].editedTime = time
+                lead.dialog[i].expert = expertId
                 await lead.save()
             }
         }
@@ -76,10 +78,10 @@ export const editDialog = async (id: string, body: any) => {
         return { error: 'خطا در تغییر کارمند' }
     }
 }
-export const addDialog = async (id: string, body: any) => {
+export const addDialog = async (id: string, body: any, expertId: string) => {
     await connect()
     let time = Date.now()
-    let data = { text: body, time: time }
+    let data = { text: body, time: time, expert: expertId }
     try {
         let updatedLead = await Lead.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
         return JSON.parse(JSON.stringify(updatedLead))
@@ -89,10 +91,10 @@ export const addDialog = async (id: string, body: any) => {
     }
 }
 
-export const addCallStatus = async (id: string, body: any) => {
+export const addCallStatus = async (id: string, body: any, expertId: string) => {
     await connect()
     let time = Date.now()
-    let data = { status: body, time: time }
+    let data = { status: body, time: time, expert: expertId }
     try {
         let updatedLead = await Lead.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
         return JSON.parse(JSON.stringify(updatedLead))

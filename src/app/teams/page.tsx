@@ -11,12 +11,12 @@ export default function Teams() {
     const [mutated, setMutated] = useState(false)
     const [filter, setFilter] = useState('')
     const [teams, setTeams] = useState([])
-    const { register, handleSubmit, setValue } = useForm<IForm>()
+    const { register, handleSubmit, reset } = useForm<IForm>()
     const handleCreateTeams = async (obj: any) => {
         let res = await createTeam(obj)
         if (!res.error) {
             setMutated(!mutated)
-            setValue('name', '')
+            reset()
         }
     }
     const allTeams = useCallback(async () => {
@@ -43,7 +43,7 @@ export default function Teams() {
                         <th>وضعیت</th>
                     </tr></thead>
                     <tbody>
-                        {teams.map((team: any,idx:number) => {
+                        {teams.map((team: any, idx: number) => {
                             if (team.name.includes(filter)) {
                                 return (<tr key={idx}>
                                     <td style={{ textAlign: 'start' }}> <Link href={`/teams/${team?._id}`} >{team.name}  </Link></td>

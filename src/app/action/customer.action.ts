@@ -5,7 +5,7 @@ import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Customer from '@/models/Customer'
 import Employe from '@/models/Employe'
- 
+
 /* ----- LEAD ----- */
 export const getCustomers = async (search?: any) => {
     await connect()
@@ -39,10 +39,10 @@ export const getSingleCustomer = async (id: string) => {
 export const createCustomer = async (body: any, convertor: any) => {
     let time = Date.now()
     body.convert = { convertor: convertor, time: time }
-    await connect()
+     await connect()
     try {
-        await Customer.create(body)
-        return { success: true }
+        let updatedCustomer = await Customer.create(body)
+        return JSON.parse(JSON.stringify(updatedCustomer))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در ثبت کارمند' }

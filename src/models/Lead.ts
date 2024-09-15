@@ -19,15 +19,17 @@ const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
 		source: { type: String, trim: true },
 		description: { type: String, trim: true },
 		expert: { type: Schema.Types.ObjectId, ref: 'Expert' },
+		creator: { type: Schema.Types.ObjectId, ref: 'User' },
+		edits: [{  time: { type: Date }, editor: { type: Schema.Types.ObjectId, ref: 'User' } }],
 		address: { type: String, trim: true, },
 		email: { type: String, trim: true, },
-		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date } }],
-		call: [{ status: { type: String }, time: { type: Date } }],
+		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
+		call: [{ status: { type: String }, time: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
 	{
-		timestamps: true,
+ 		timestamps: true,
 	},
 )
 

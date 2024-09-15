@@ -19,16 +19,17 @@ const baseCustomerSchema = new Schema<ICustomer, Model<ICustomer, any, any>, any
 		source: { type: String, trim: true },
 		description: { type: String, trim: true },
 		expert: { type: Schema.Types.ObjectId, ref: 'Expert' },
+ 		edits: [{  time: { type: Date }, editor: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
 		address: { type: String, trim: true, },
 		email: { type: String, trim: true, },
-		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date } }],
-		call: [{ status: { type: String }, time: { type: Date } }],
-		convert: { convertor:{ type: Schema.Types.ObjectId, ref: 'Expert' }, time: { type: Date } },
-		isDeleted: { type: Boolean, required: true, default: false },
+		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
+		call: [{ status: { type: String }, time: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
+	convert: { convertor: { type: Schema.Types.ObjectId, ref: 'Expert' }, time: { type: Date } },
+	isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
 	{
-		timestamps: true,
+ 		timestamps: true,
 	},
 )
 
@@ -65,3 +66,4 @@ queriesForSoftDelete.forEach((type: any) => {
 
 const Customer = models.Customer || model<ICustomer>('Customer', baseCustomerSchema)
 export default Customer
+
