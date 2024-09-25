@@ -7,7 +7,6 @@ import connect from '../lib/db'
 import Client from '@/models/Client'
 
 export const signinUser = async (body: any) => {
-	console.log('signinuser')
 
 	await connect()
 	try {
@@ -27,7 +26,6 @@ export const signinUser = async (body: any) => {
 }
 
 export const signupUser = async (body: any) => {
-	console.log('signupuser')
 	await connect()
 	try {
 		const newUser = await User.create({ user_name: body.user_name, name: nanoid(), password: body.password, role: 1 })
@@ -40,7 +38,6 @@ export const signupUser = async (body: any) => {
 }
 
 export const signinClient = async (body: any) => {
-	console.log('signinclient')
 
 	await connect()
 	try {
@@ -60,7 +57,6 @@ export const signinClient = async (body: any) => {
 }
 
 export const signupClient = async (body: any) => {
-	console.log('signupxeclient')
 	await connect()
 	try {
 		const newUser = await Client.create({ user_name: body.user_name, name: nanoid(), password: body.password, mobile_number: body.mobile_number, role: 2 })

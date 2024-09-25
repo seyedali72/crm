@@ -6,14 +6,12 @@ import { Schema, model, Model, models } from 'mongoose'
 const baseCustomerCatSchema = new Schema<ICustomerCat, Model<ICustomerCat, any, any>, any>(
 	{
 		name: {
-			type: String,
-			text: true,
-			trim: true,
+			type: String, 
 			required: [true, 'نام الزامی است'],
 			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
 		},
 		parent: { type: Schema.Types.ObjectId, ref: 'CustomerCat' },
-		users: [{ type: Schema.Types.ObjectId, ref: 'Employe' }],
+		users: [{ type: Schema.Types.ObjectId, ref: 'Customer' }],
 		status: { type: String, trim: true, default: 'فعال' },
 		description: { type: String, trim: true },
 		isDeleted: { type: Boolean, required: true, default: false },
@@ -26,14 +24,14 @@ const baseCustomerCatSchema = new Schema<ICustomerCat, Model<ICustomerCat, any, 
 
 baseCustomerCatSchema.method({
 	softDelete: async function () {
-		this.mobile_number += '-deleted'
+		this.name += '-deleted'
 		this.$isDeleted(true)
 		this.isDeleted = true
 		this.deletedAt = new Date()
 		return this.save()
 	},
 	restore: async function () {
-		this.mobile_number = this.mobile_number.replace('-deleted', '')
+		this.name = this.name.replace('-deleted', '')
 		this.$isDeleted(false)
 		this.isDeleted = false
 		this.deletedAt = null

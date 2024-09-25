@@ -5,13 +5,16 @@ import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Lead from '@/models/Lead'
 import Employe from '@/models/Employe'
+import CustomerCat from '@/models/CustomerCategory'
+import Contact from '@/models/Contact'
+import Company from '@/models/Company'
 
 /* ----- LEAD ----- */
 export const getLeads = async (search?: any) => {
     await connect()
 
     try {
-        const allLeads = await Lead.find(buildQuery(search)).populate({ path: 'expert', populate: { path: 'employe_id', model: Employe } })
+        const allLeads = await Lead.find(buildQuery(search)).populate([{ path: 'expert', populate: { path: 'employe_id', model: Employe } }, { path: 'contactId', model: Contact }])
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -28,7 +31,7 @@ export const getSingleLead = async (id: string) => {
     await connect()
 
     try {
-        const singleLead = await Lead.findById(id).populate([{ path: 'expert', model: Expert, populate: [{ path: 'employe_id', model: Employe }] }])
+        const singleLead = await Lead.findById(id).populate([{ path: 'contactId', model: Contact, populate: ([{ path: 'categoryId', select: 'name', model: CustomerCat }, { path: 'companyId', select: 'name', model: Company }]) }, { path: 'expert', select: 'employe_id', model: Expert, populate: ({ path: 'employe_id', select: 'name', model: Employe }) }])
         return JSON.parse(JSON.stringify(singleLead))
     } catch (error) {
         console.log(error)
@@ -38,12 +41,18 @@ export const getSingleLead = async (id: string) => {
 
 export const createLead = async (body: any) => {
     await connect()
-    try {
-        await Lead.create(body)
-        return { success: true }
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در ثبت کارمند' }
+    let id = body?.contactId
+    let data = await Lead.findOne({ contactId: id })
+    if (data?._id == null) {
+        try {
+            let res = await Lead.create(body)
+            return JSON.parse(JSON.stringify(res))
+        } catch (error) {
+            console.log(error)
+            return { error: 'خطا در تبدیل مخاطب' }
+        }
+    } else {
+        return { error: 'این مخاطب قبلا تبدیل شده است' }
     }
 }
 

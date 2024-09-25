@@ -1,17 +1,17 @@
 'use server'
 
-import Teams from '@/models/Teams'
+import Team from '@/models/Team'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Expert from '@/models/Expert'
 import Employe from '@/models/Employe'
- 
+
 /* ----- team ----- */
 export const getTeams = async (search?: any) => {
     await connect()
 
     try {
-        const allTeams = await Teams.find(buildQuery(search))
+        const allTeams = await Team.find(buildQuery(search)).populate({ path: 'parent', model: Team })
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -28,7 +28,7 @@ export const getSingleTeam = async (id: string) => {
     await connect()
 
     try {
-        const singleTeam = await Teams.findById(id).populate({ path: 'users', model: Expert, populate: [{ path: 'employe_id', model: Employe }] })
+        const singleTeam = await Team.findById(id).populate([{ path: 'users', model: Expert, populate: [{ path: 'employe_id', model: Employe }] },{path:'parent',model:Team}])
         return JSON.parse(JSON.stringify(singleTeam))
     } catch (error) {
         console.log(error)
@@ -39,7 +39,7 @@ export const getSingleTeam = async (id: string) => {
 export const createTeam = async (body: any) => {
     await connect()
     try {
-        await Teams.create(body)
+        await Team.create(body)
         return { success: true }
     } catch (error) {
         console.log(error)
@@ -50,37 +50,7 @@ export const createTeam = async (body: any) => {
 export const editTeam = async (id: string, body: any) => {
     await connect()
     try {
-        let updatedTeam = await Teams.findByIdAndUpdate(id, body, { new: true })
-        return JSON.parse(JSON.stringify(updatedTeam))
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
-    }
-}
-export const editDialog = async (id: string, body: any) => {
-    await connect()
-    let time = Date.now()
-    try {
-        let team = await Teams.findById(id)
-        for (let i = 0; i < team.dialog.length; i++) {
-            if (team.dialog[i]._id == body.dialogTextId) {
-                team.dialog[i].text = body.text
-                team.dialog[i].editedTime = time
-                await team.save()
-            }
-        }
-        return JSON.parse(JSON.stringify(team))
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
-    }
-}
-export const addDialog = async (id: string, body: any) => {
-    await connect()
-    let time = Date.now()
-    let data = { text: body, time: time }
-    try {
-        let updatedTeam = await Teams.findByIdAndUpdate(id, { $push: { dialog: data } }, { new: true })
+        let updatedTeam = await Team.findByIdAndUpdate(id, body, { new: true })
         return JSON.parse(JSON.stringify(updatedTeam))
     } catch (error) {
         console.log(error)
@@ -92,7 +62,7 @@ export const deleteTeam = async (teamId: string) => {
     await connect()
 
     try {
-        const found = await Teams.findById(teamId)
+        const found = await Team.findById(teamId)
 
         if (!found) {
             return { error: 'مقاله وجود ندارد' }

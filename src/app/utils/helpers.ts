@@ -1,5 +1,5 @@
 import { dirname, join } from 'path'
- import url from 'url'
+import url from 'url'
 import persian_fa from 'react-date-object/locales/persian_fa'
 import persian from 'react-date-object/calendars/persian'
 import gregorian from 'react-date-object/calendars/gregorian'
@@ -18,7 +18,7 @@ export const queriesForSoftDelete = [
 	// "findOne",
 ]
 
- 
+
 export const sideItems = (leadType: string) => [
 	{
 		navId: 1,
@@ -349,14 +349,20 @@ export function spliteNumber(price: number) {
 	return new Intl.NumberFormat().format(price)
 }
 
-export const convertToPersianDate = (date: any) => {
-	return new DateObject(date).convert(persian, persian_fa).format('YYYY/MM/DD hh:mm')
+
+export const convertToPersianDate = (date: any, type: string) => {
+	if (type === 'YYMDHM') { return new DateObject(date).convert(persian, persian_fa).format('HH:mm - YYYY/MM/DD') }
+	if (type === 'YMDHM') { return new DateObject(date).convert(persian, persian_fa).format('HH:mm - YY/MM/DD') }
+	if (type === 'MDHM') { return new DateObject(date).convert(persian, persian_fa).format('HH:mm - MM/DD') }
+	if (type === 'YYMD') { return new DateObject(date).convert(persian, persian_fa).format('YY/MM/DD') }
+	if (type === 'YMD') { return new DateObject(date).convert(persian, persian_fa).format('YYYY/MM/DD') }
+	if (type === 'MD') { return new DateObject(date).convert(persian, persian_fa).format('MM/DD') }
+	if (type === 'HM') { return new DateObject(date).convert(persian, persian_fa).format('HH:mm') }
 }
 
 export const convertToTimeStamp = (date: any) => {
-	const d = new Date(date)
-
-	return d.toISOString()
+	let time = Date.parse(date?.convert(gregorian, gregorian_en).format())
+	return time
 }
 
 export const convertToGregorianianDate = (date: any) => {
@@ -367,4 +373,3 @@ export const createOption = (label: string) => ({
 	label,
 	value: label,
 })
- 

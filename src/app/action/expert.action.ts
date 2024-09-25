@@ -4,16 +4,18 @@ import { model } from 'mongoose';
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Expert from '@/models/Expert'
-import Teams from '@/models/Teams';
+import Team from '@/models/Team';
 import Lead from '@/models/Lead';
 import Employe from '@/models/Employe';
+import Customer from '@/models/Customer';
+import Contact from '@/models/Contact';
 
 /* ----- LEAD ----- */
 export const getExperts = async (search?: any) => {
     await connect()
 
     try {
-        const allExperts = await Expert.find(buildQuery(search)).populate([{ path: 'employe_id', model: Employe }, { path: 'teams', model: Teams }])
+        const allExperts = await Expert.find(buildQuery(search)).populate([{ path: 'employe_id', model: Employe }, { path: 'teams', model: Team }])
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -30,8 +32,8 @@ export const getSingleExpert = async (id: string) => {
     await connect()
 
     try {
-        const singleExpert = await Expert.findById(id).populate([{ path: 'employe_id', model: Employe }, { path: 'teams', model: Teams }, { path: 'leads', model: Lead }])
-        return JSON.parse(JSON.stringify(singleExpert))
+        const singleExpert = await Expert.findById(id).populate([ { path: 'teams', model: Team },{ path: 'employe_id', select: 'name national_code', model: Employe }, { path: 'leads', model: Lead, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }, { path: 'customers', model: Customer, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }])
+         return JSON.parse(JSON.stringify(singleExpert))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت کارمند' }
@@ -42,7 +44,7 @@ export const createExpert = async (body: any) => {
     await connect()
     try {
         let res = await Expert.create(body)
-        await Teams.findByIdAndUpdate(body?.teams, { $push: { users: res?._id } }, { new: true })
+        await Team.findByIdAndUpdate(body?.teams, { $push: { users: res?._id } }, { new: true })
         return { success: true }
     } catch (error) {
         console.log(error)
@@ -100,12 +102,10 @@ export const deleteLeadFromExpert = async (id: string, expertId: string) => {
         return { error: 'خطا در تغییر کارمند' }
     }
 }
-export const addCustomerToExpert = async (id: string, expertId: string) => {
+export const addCustomerToExpert = async (id: string, body: any, expertId: string) => {
     await connect()
-    console.log(id, 'id', expertId, 'expertId')
     try {
-        let updatedExpert = await Expert.findByIdAndUpdate(expertId, { $push: { customers: id } }, { new: true })
-        console.log(updatedExpert)
+        let updatedExpert = await Expert.findByIdAndUpdate(expertId, { ...body, $push: { customers: id } }, { new: true })
         return JSON.parse(JSON.stringify(updatedExpert))
     } catch (error) {
         console.log(error)

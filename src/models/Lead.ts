@@ -4,45 +4,31 @@ import crypto from 'crypto'
 import { Schema, model, Model, models } from 'mongoose'
 
 const baseLeadSchema = new Schema<ILead, Model<ILead, any, any>, any>(
-	{
-		name: {
-			type: String,
-			text: true,
-			trim: true,
-			required: [true, 'نام الزامی است'],
-			maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'],
-		},
-		mobile_number: { type: String, index: { unique: true, sparse: true }, required: [true, 'شماره همراه الزامی است'], },
-		status: { type: String, trim: true, default: 'جدید' },
-		website: { type: String, trim: true },
-		title: { type: String, trim: true },
-		source: { type: String, trim: true },
-		description: { type: String, trim: true },
+	{ 
+		contactId: { type: Schema.Types.ObjectId, ref: 'Contact' },
 		expert: { type: Schema.Types.ObjectId, ref: 'Expert' },
-		creator: { type: Schema.Types.ObjectId, ref: 'User' },
-		edits: [{  time: { type: Date }, editor: { type: Schema.Types.ObjectId, ref: 'User' } }],
-		address: { type: String, trim: true, },
-		email: { type: String, trim: true, },
+		assignedAt: { type: Date },
+ 		edits: [{ time: { type: Date }, editor: { type: Schema.Types.ObjectId, ref: 'User' } }], 
 		dialog: [{ text: { type: String }, time: { type: Date }, editedTime: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
 		call: [{ status: { type: String }, time: { type: Date }, expert: { type: Schema.Types.ObjectId, ref: 'Expert' } }],
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},
 	{
- 		timestamps: true,
+		timestamps: true,
 	},
 )
 
 baseLeadSchema.method({
 	softDelete: async function () {
-		this.mobile_number += '-deleted'
+		this.phone_number_1 += '-deleted'
 		this.$isDeleted(true)
 		this.isDeleted = true
 		this.deletedAt = new Date()
 		return this.save()
 	},
 	restore: async function () {
-		this.mobile_number = this.mobile_number.replace('-deleted', '')
+		this.phone_number_1 = this.phone_number_1.replace('-deleted', '')
 		this.$isDeleted(false)
 		this.isDeleted = false
 		this.deletedAt = null

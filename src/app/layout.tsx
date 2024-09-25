@@ -1,8 +1,31 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Link from "next/link";
+import 'bootstrap/dist/css/bootstrap.css'
+import 'react-toastify/dist/ReactToastify.css'
+import 'font-awesome/css/font-awesome.min.css'
 import Providers from "./components/Providers";
+import localFont from 'next/font/local'
+import SideBar from "./components/SideBar";
+import HeaderPanel from "./components/Header_Panel";
+ import NextTopLoader from "nextjs-toploader";
+import { ToastContainer, Zoom } from "react-toastify";
 
+const Light = localFont({
+  src: '../../public/assets/fonts/Sans/IRANSansWeb_Light.woff',
+  variable: '--font-light',
+})
+const Medium = localFont({
+  src: '../../public/assets/fonts/Sans/IRANSansWeb_Medium.woff',
+  variable: '--font-medium',
+})
+const Bold = localFont({
+  src: '../../public/assets/fonts/Sans/IRANSansWeb_Bold.woff',
+  variable: '--font-bold',
+})
+const fanum = localFont({
+  src: '../../public/assets/fonts/Sans/IRANSansWeb-FaNum.woff',
+  variable: '--font-fanum',
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,18 +39,31 @@ export default function RootLayout({
 }>) {
   return (
     <Providers>
-      <html lang="en">
-        <body style={{ padding: 15 }} >
-          <ul style={{ display: 'flex', gap: 25, padding: 10 }}>
-            <Link href={`/`}><li>خانه</li></Link>
-            <Link href={`/employe`}><li>پرسنل</li></Link>
-            <Link href={`/expert`}><li>کارشناس ها</li></Link>
-            <Link href={`/teams`}><li>تیم ها</li></Link>
-            <Link href={`/customers/categories`}><li>زمینه فعالیت مشتریان</li></Link>
-            <Link href={`/leads`}><li>سرنخ ها</li></Link>
-            <Link href={`/customers`}><li>مشتریان ها</li></Link>
-          </ul>
-          {children}</body>
+      <html lang='fa' dir='rtl'>
+        <body className={`${Bold.variable} ${Medium.variable} ${Light.variable} ${fanum.variable} `}>
+        <ToastContainer
+						position='top-center'
+						autoClose={2000}
+						hideProgressBar={false}
+						newestOnTop={true}
+						closeOnClick
+						rtl={true}
+						limit={2}
+						pauseOnFocusLoss={false}
+						pauseOnHover={false}
+						transition={Zoom}
+						theme='colored'
+					/>
+					<NextTopLoader color='#ffb602' height={5} />
+
+          <HeaderPanel />
+          <section className="body-container">
+            <SideBar />
+            <section id="main-body" className="main-body">
+              {children}
+            </section>
+          </section>
+        </body> 
       </html>
     </Providers>
   );

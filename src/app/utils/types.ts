@@ -19,6 +19,15 @@ interface ITeams {
 	isDeleted?: boolean
 	deletedAt?: Date
 }
+interface IDepartment {
+	name: string
+	status: string
+	description: string
+	parent?: Types.ObjectId
+	users?: [Types.ObjectId]
+	isDeleted?: boolean
+	deletedAt?: Date
+}
 
 interface ICategory {
 	name: string
@@ -39,14 +48,12 @@ interface IExpert {
 	employe_id: Types.ObjectId
 	user_name: string
 	password: string
-	role:number
+	role: number
 	roles?: string
 	teams?: string
 	title?: string
-	email?: string
-	status?: string
-	type?: Types.ObjectId
-	description?: string
+ 	status?: string
+ 	description?: string
 	leads?: [Types.ObjectId]
 	customers?: [Types.ObjectId]
 	lastActivity: object
@@ -64,37 +71,56 @@ interface IUser {
 	deletedAt?: Date
 }
 
-interface ICustomer {
+interface IContact {
 	name: string
-	mobile_number: string
-	website?: string
+	phone_number_1: string
+	phone_number_2: string
+	source?: string
 	title?: string
+	description?: string
 	address?: string
-	expert?: Types.ObjectId
 	email?: string
 	status?: string
-	source?: string
-	convert?: object
-	description?: string
-	dialog?: string
+	categoryId?: Types.ObjectId
+	companyId?: Types.ObjectId
+	creator?: Types.ObjectId
+	birthdayDate?: Date
+	converted: boolean
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+interface ICustomer {
+	contactId?: Types.ObjectId
+	expert?: Types.ObjectId
+	assignedAt?: Date
+	dialog?: string[]
+	call?: string[]
 	edits?: string[]
-	call: string
+	convert?: object
 	isDeleted?: boolean
 	deletedAt?: Date
 }
 
-interface ILead {
+interface ICompany {
 	name: string
-	mobile_number: string
+	phone_number_1: string
+	phone_number_2: string
 	website?: string
-	title?: string
 	address?: string
-	expert?: Types.ObjectId
+	categoryId?: Types.ObjectId
 	creator: Types.ObjectId
 	email?: string
 	status?: string
 	source?: string
 	description?: string
+	isDeleted?: boolean
+	deletedAt?: Date
+}
+
+interface ILead {
+	contactId?: Types.ObjectId
+	expert?: Types.ObjectId
+	assignedAt?: Date
 	dialog?: string[]
 	call?: string[]
 	edits?: string[]
@@ -104,8 +130,19 @@ interface ILead {
 
 interface IEmploye {
 	name: string
-	national_code: string
+	national_code: number
+	mobile_number: number
+	phone_number: number
+	department_id: Types.ObjectId
 	gender: string
+	email: string
+	status: string
+	emergencyContacts: string[]
+	skill: string
+	empolyeCode: string
+	address: string
+	birthdayDate?: Date
+	joinDate?: Date
 	isDeleted?: boolean
 	deletedAt?: Date
 }
@@ -191,14 +228,14 @@ interface IMeta {
 }
 
 export type {
-	ICategory,ICustomerCat,
+	ICategory, ICustomerCat,
 	IMeta, ITeams,
 	IClient, IUser,
 	ILead, ICustomer,
 	IFile, IExpert,
 	IOTP, IEmploye,
-	IPage,
-	IProduct,
-	ITicket,
+	IPage, IDepartment,
+	IProduct, ICompany,
+	ITicket, IContact,
 	ISetting,
 }
