@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
-import { useUser } from '../context/UserProvider'
+import { useUser } from '../../context/UserProvider'
 import { toast } from 'react-toastify'
 
 interface FormValues {
@@ -14,7 +14,7 @@ interface FormValues {
   password: string
 }
 
-const LoginForm = () => {
+export default function LoginForm() {
   const {
     register,
     handleSubmit,
@@ -83,4 +83,3 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm

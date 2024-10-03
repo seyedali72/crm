@@ -1,24 +1,30 @@
 'use client'
 
-import { createCompany, getCompanies } from "@/app/action/company.action"
+import { getCompanies } from "@/app/action/company.action"
 import { editContact } from "@/app/action/contact.action"
 import { createCustomer } from "@/app/action/customer.action"
 import { addCustomerToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import {  addCustomerToExpert,  addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
+import { addCallToEx, addCustomerToExpert, addDialogToEx, addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
 import { addCallStatus, addDialog, deleteLead, editDialog, editLead, getSingleLead } from "@/app/action/lead.action"
+import { createReminder, getReminders } from "@/app/action/reminder.action"
 import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import { nanoid } from "nanoid"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+ import { useCallback, useEffect, useState } from "react"
 import persian from "react-date-object/calendars/persian"
 import persian_fa from "react-date-object/locales/persian_fa"
 import { Controller, useForm } from "react-hook-form"
 import DatePicker from "react-multi-date-picker"
+import TimePicker from "react-multi-date-picker/plugins/time_picker"
 import { toast } from "react-toastify"
 interface FormValues {
     text: string
+}
+interface FormValues1 {
+    description: string
+    schedule: Date
 }
 interface FormValues2 {
     text: string
@@ -38,6 +44,8 @@ export default function EditLead() {
     const [mutated, setMutated] = useState(false)
     const [dialogId, setDialogId] = useState('')
     const [status, setStatus] = useState('')
+    const [reminderPopup, setReminderPopup] = useState(false)
+    const [typeReminder, setTypeReminder] = useState('')
     const [catId, setCatId] = useState<any>()
     const [expertId, setExpertId] = useState('')
     const [dialogText, setDialogText] = useState('')
@@ -48,6 +56,7 @@ export default function EditLead() {
     const [deletedCheck, setDeletedCheck] = useState(false)
     const [popup, setPopup] = useState(false)
     const [changeExpertPopup, setChangeExpertPopup] = useState(false)
+    const [reminders, setReminders] = useState<any>([])
     const [customerPopup, setCustomerPopup] = useState(false)
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
@@ -62,6 +71,8 @@ export default function EditLead() {
         setCompanyList(company)
         let categories = await getCustomerCats({ isDeleted: false })
         setCatList(categories)
+        let data = await getReminders({ expertId: user?._id, isDeleted: false, leadId: lead?._id })
+        setReminders(data)
     }, [])
     useEffect(() => {
         fetchLead()
@@ -69,16 +80,28 @@ export default function EditLead() {
 
     const handleCallStatus = async (obj: any) => {
         await addCallStatus(singleLead?._id, obj, singleLead?.expert?._id)
+        await addCallToEx(singleLead?.expert?._id, singleLead?.contactId?._id, obj)
         setMutated(!mutated)
     }
     const { handleSubmit, register, reset } = useForm<FormValues>()
+    const { handleSubmit: handleSubmit1, register: register1, reset: reset1, control: control1 } = useForm<FormValues1>()
     const { handleSubmit: handleSubmit2, register: register2, } = useForm<FormValues2>({ values: { text: dialogText } })
     const { handleSubmit: handleSubmit3, register: register3, setValue: setValue3, control } = useForm<FormValues3>({ values: { name: singleLead?.contactId?.name, phone_number_1: singleLead?.contactId?.phone_number_1, phone_number_2: singleLead?.contactId?.phone_number_2, email: singleLead?.contactId?.email, title: singleLead?.contactId?.title, address: singleLead?.contactId?.address, source: singleLead?.contactId?.source, description: singleLead?.contactId?.description, birthdayDate: singleLead?.contactId?.birthdayDate !== undefined ? Date.parse(singleLead?.contactId?.birthdayDate) : 0, } })
 
+    const handleCreateReminder = async (obj: any) => {
+        obj.name = `reminder-${typeReminder}${nanoid(6)}`
+        obj.type = typeReminder
+        obj.expertId = user?._id
+        obj.leadId = singleLead?._id
+        let final = JSON.parse(JSON.stringify(obj))
+         let res = await createReminder(final)
+        if (!res.error) { setReminderPopup(false); setMutated(!mutated); reset1() }
+    }
 
     const handleCreateDialog = async (obj: any) => {
         let res = await addDialog(singleLead?._id, obj.text, user?._id)
         if (!res?.error) {
+            await addDialogToEx(user?._id, obj.text, singleLead?.contactId?._id)
             reset()
             setMutated(!mutated)
         }
@@ -116,7 +139,7 @@ export default function EditLead() {
             await deleteLead(singleLead?._id)
             await addCustomerToExpert(res?._id, { assignedAt: time }, expertId)
             await deleteLeadFromExpert(singleLead?._id, expertId)
-            router.replace('/account/leads')
+            router.replace('/expert/leads')
         } else {
             toast.error('متاسفانه تبدیل سرنخ به مشتری انجام نشد')
         }
@@ -160,13 +183,14 @@ export default function EditLead() {
     if (deletedCheck) {
         return <p>این سرنخ حذف یا تبدیل گردیده است</p>
     }
+
     if (singleLead?.contactId !== undefined) {
         return (
             <>
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-0">
-                        <li className="breadcrumb-item"><Link href="/account/">خانه</Link></li>
-                        <li className="breadcrumb-item"><Link href="/account/leads">لیست سرنخ ها</Link></li>
+                        <li className="breadcrumb-item"><Link href="/expert/">خانه</Link></li>
+                        <li className="breadcrumb-item"><Link href="/expert/leads">لیست سرنخ ها</Link></li>
                         <li className="breadcrumb-item active" aria-current="page">{singleLead?.contactId?.name}</li>
                     </ol>
                 </nav>
@@ -189,7 +213,34 @@ export default function EditLead() {
                         {/* پایان شرطی  */}
                     </section>
                 </div> : ''}
-
+                {reminderPopup && <div className="popupCustome">
+                    <section className="main-body-container rounded">
+                        <div className="d-flex justify-content-between"> <h5>زمان یادآوری را مشخص کنید</h5>
+                            <button onClick={() => setReminderPopup(false)} className="btn btn-sm" type="button"><i className="fa fa-times"></i></button>
+                        </div>
+                        <form onSubmit={handleSubmit1(handleCreateReminder)} method="post" className="col-12 d-flex flex-column gap-2">
+                            <div className="col-12">
+                                <label className="my-1" >{typeReminder}</label>
+                                <div className='datePicker'>
+                                    <Controller
+                                        control={control1}
+                                        name="schedule"
+                                        render={({ field: { onChange, value } }) => (
+                                            <DatePicker className="form-control " value={value || ''} placeholder="زمان و تاریخ مورد نظر را انتخاب کنید"
+                                                format=" HH:mm:ss - YYYY/MM/DD" calendarPosition="bottom-right"
+                                                plugins={[<TimePicker position="right" />]}
+                                                calendar={persian} locale={persian_fa} onChange={(date) => { onChange(date) }} />
+                                        )} />
+                                </div>
+                            </div>
+                            <div className="col-12">
+                                <label className="my-1" >توضیحات اضافی</label>
+                                <textarea className="form-control" placeholder="توضیحات اضافی" {...register1('description')} ></textarea>
+                            </div>
+                            <div className="col-12"><button type="submit" className="btn w-100 btn-sm bg-custom-2 text-white px-3" >ثبت</button></div>
+                        </form>
+                    </section>
+                </div>}
                 <section className="d-flex flex-column flex-md-row">
                     <section className="col-md-8 ps-2">
                         <section className="main-body-container rounded">
@@ -291,11 +342,9 @@ export default function EditLead() {
                     </section>
                     <section className="col-md-4 pe-2">
                         <section className="main-body-container rounded">
-                            {singleLead?.expert !== undefined && <p className="w-100 d-flex justify-content-between align-item-center"><span>نام کارشناس: <Link href={`/account/expert/${singleLead?.expert?._id}`}> {singleLead?.expert?.employe_id?.name}</Link></span>
-                                <span onClick={() => { setPopup(true), setChangeExpertPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>}
                             {singleLead?.assignedAt !== undefined && <p>زمان اختصاص به کارشناس <b> {convertToPersianDate(singleLead?.assignedAt, 'YMDHM')}</b></p>}
                             <p>زمان ساخت سرنخ <b>{convertToPersianDate(singleLead?.createdAt, "YMDHM")}</b></p>
-                         {lastActivityResult !== 0 &&    <p>آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>}
+                            {lastActivityResult !== 0 && <p>آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>}
 
                             <div className="d-flex gap-1 align-items-center mb-3">
                                 <span className="text-nowrap" >شرکت مربوطه سرنخ:</span>
@@ -303,7 +352,7 @@ export default function EditLead() {
                                     <option value=''>یک شرکت را انتخاب کنید</option>
                                     {companyList?.map((company: any) => { return (<option key={nanoid()} value={company?._id}>{company?.name}</option>) })}
                                 </select>
-                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link>}
+                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/expert/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link>}
                             </div>
 
                             <div className="d-flex gap-1 align-items-center mb-3">
@@ -312,7 +361,7 @@ export default function EditLead() {
                                     <option value=''>یک زمینه را انتخاب کنید</option>
                                     {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
                                 </select>
-                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link>}
+                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/expert/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link>}
                             </div>
                             <div className="d-flex gap-1 align-items-center mb-2">
                                 <span >وضعیت:</span>
@@ -331,16 +380,15 @@ export default function EditLead() {
                         <section className="main-body-container rounded">
                             <div className="d-flex justify-content-between mb-2"> <b>یادآور</b>
                                 <div className="d-flex gap-1 align-items-center">
-                                    <button className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar"></i></button>
-                                    <button className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-phone"></i></button>
-                                    <button className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-birthday-cake"></i></button>
-                                    <button className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar-check-o"></i></button>
+                                    <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('مناسبت تقویمی') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar"></i></button>
+                                    <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('تماس تلفنی') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-phone"></i></button>
+                                    <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('مناسبت تولد') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-birthday-cake"></i></button>
+                                    <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('جلسه حضوری') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar-check-o"></i></button>
                                 </div>
                             </div>
-                            <p><i className="fa fa-calendar-check-o"></i> جلسه حضوری <b>سه شنبه 12:30 الی 15:00</b></p>
-                            <p><i className="fa fa-phone"></i> تماس مجدد <b>یکشنبه 12:30</b></p>
-                            <p><i className="fa fa-calendar"></i> مناسبت تقویمی<b> 20 شهریور</b></p>
-                            <p><i className="fa fa-birthday-cake"></i> تولد سرنخ <b> 21 آذر</b></p>
+                            {reminders?.map((reminder: any) => {
+                                return (<p key={nanoid()}><i className={`fa ${reminder?.type == 'مناسبت تقویمی' ? 'fa-calendar' : reminder?.type == 'مناسبت تولد' ? 'fa-birthday-cake' : reminder?.type == 'تماس تلفنی' ? 'fa-phone' : 'fa-calendar-check-o'}`}></i>{' '}{reminder?.type}{' '}<b>{convertToPersianDate(reminder?.schedule, 'YYMDHM')}</b></p>)
+                            })}
                         </section>
                         <section className="main-body-container rounded">
                             <div className="d-flex align-items-center justify-content-between mb-2"><b>تماس ها:  {singleLead.call.length} عدد</b>

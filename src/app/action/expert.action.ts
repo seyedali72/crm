@@ -1,5 +1,4 @@
-import { model } from 'mongoose';
-'use server'
+ 'use server'
 
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
@@ -9,8 +8,9 @@ import Lead from '@/models/Lead';
 import Employe from '@/models/Employe';
 import Customer from '@/models/Customer';
 import Contact from '@/models/Contact';
+import { cookies } from 'next/headers';
 
-/* ----- LEAD ----- */
+/* ----- expert ----- */
 export const getExperts = async (search?: any) => {
     await connect()
 
@@ -32,8 +32,8 @@ export const getSingleExpert = async (id: string) => {
     await connect()
 
     try {
-        const singleExpert = await Expert.findById(id).populate([ { path: 'teams', model: Team },{ path: 'employe_id', select: 'name national_code', model: Employe }, { path: 'leads', model: Lead, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }, { path: 'customers', model: Customer, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }])
-         return JSON.parse(JSON.stringify(singleExpert))
+        const singleExpert = await Expert.findById(id).populate([{ path: 'teams', model: Team }, { path: 'employe_id', select: 'name national_code', model: Employe }, { path: 'leads', model: Lead, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }, { path: 'customers', model: Customer, populate: ([{ path: 'contactId', select: 'name status phone_number_1', model: Contact }]) }])
+        return JSON.parse(JSON.stringify(singleExpert))
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت کارمند' }
@@ -62,24 +62,7 @@ export const editExpert = async (id: string, body: any) => {
         return { error: 'خطا در تغییر کارمند' }
     }
 }
-export const editDialog = async (id: string, body: any) => {
-    await connect()
-    let time = Date.now()
-    try {
-        let expert = await Expert.findById(id)
-        for (let i = 0; i < expert.dialog.length; i++) {
-            if (expert.dialog[i]._id == body.dialogTextId) {
-                expert.dialog[i].text = body.text
-                expert.dialog[i].editedTime = time
-                await expert.save()
-            }
-        }
-        return JSON.parse(JSON.stringify(expert))
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
-    }
-}
+
 export const addLeadToExpert = async (id: string, expertId: string) => {
     await connect()
 
@@ -123,18 +106,7 @@ export const removeCustomerFromExpert = async (id: string, expertId: any) => {
         return { error: 'خطا در تغییر کارمند' }
     }
 }
-export const addCallStatus = async (id: string, body: any) => {
-    await connect()
-    let time = Date.now()
-    let data = { status: body, time: time }
-    try {
-        let updatedExpert = await Expert.findByIdAndUpdate(id, { $push: { call: data } }, { new: true })
-        return JSON.parse(JSON.stringify(updatedExpert))
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
-    }
-}
+
 export const deleteExpert = async (expertId: string) => {
     await connect()
 
@@ -150,5 +122,47 @@ export const deleteExpert = async (expertId: string) => {
     } catch (error) {
         console.log(error)
         return { error: 'خطا در پاک کردن کارمند' }
+    }
+}
+
+export const signinExpert = async (body: any) => {
+    await connect()
+    try {
+        const found = await Expert.findOne({ isDeleted: false, user_name: body.user_name, password: body.password, }).populate({ path: 'employe_id', select: 'name mobile_number', model: Employe })
+        const forCoockie = { name: found.employe_id.name, mobile_number: found.employe_id.mobile_number, user_name: found.user_name, _id: found._id, role: 9, userType: 'expert', isDeleted: false }
+        if (forCoockie) {
+            cookies().set('user', JSON.stringify(forCoockie))
+            return JSON.parse(JSON.stringify(forCoockie))
+        }
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در ورود کارشناس' }
+    }
+}
+
+export const addDialogToEx = async (id: string, body: any, contactId: string) => {
+    await connect()
+    let time = Date.now()
+    let data = { text: body, time: time, contact: contactId }
+    try {
+        let updatedExpert = await Expert.findByIdAndUpdate(id, { $push: { dialogs: data } }, { new: true })
+        console.log(updatedExpert)
+        return JSON.parse(JSON.stringify(updatedExpert))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+
+export const addCallToEx = async (id: string, contactId: string, body: any) => {
+    await connect()
+    let time = Date.now()
+    let data = { status: body, time: time, contact: contactId }
+    try {
+        let updatedExpert = await Expert.findByIdAndUpdate(id, { $push: { calls: data } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedExpert))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
     }
 }

@@ -9,6 +9,19 @@ interface ICustomerCat {
 	isDeleted?: boolean
 	deletedAt?: Date
 }
+interface IReminder {
+	name: string
+	type: string
+	status: string
+	description: string
+	excerpt?: string[]
+	schedule?: Date
+	expertId: Types.ObjectId
+	leadId?: Types.ObjectId
+	customerId?: Types.ObjectId
+	isDeleted?: boolean
+	deletedAt?: Date
+}
 
 interface ITeams {
 	name: string
@@ -52,8 +65,10 @@ interface IExpert {
 	roles?: string
 	teams?: string
 	title?: string
- 	status?: string
- 	description?: string
+	status?: string
+	description?: string
+	dialogs?: string[]
+	calls?: string[]
 	leads?: [Types.ObjectId]
 	customers?: [Types.ObjectId]
 	lastActivity: object
@@ -237,5 +252,5 @@ export type {
 	IPage, IDepartment,
 	IProduct, ICompany,
 	ITicket, IContact,
-	ISetting,
+	ISetting, IReminder
 }

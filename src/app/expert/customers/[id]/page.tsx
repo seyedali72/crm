@@ -2,10 +2,9 @@
 
 import { createCompany, getCompanies } from "@/app/action/company.action"
 import { editContact } from "@/app/action/contact.action"
-import { createCustomer } from "@/app/action/customer.action"
+import { addCallStatus, addDialog, createCustomer, editCustomer, editDialog, getSingleCustomer } from "@/app/action/customer.action"
 import { addCustomerToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import {  addCustomerToExpert,  addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
-import { addCallStatus, addDialog, deleteLead, editDialog, editLead, getSingleLead } from "@/app/action/lead.action"
+import { addCustomerToExpert, addLeadToExpert, deleteLeadFromExpert, getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
 import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import { nanoid } from "nanoid"
@@ -44,7 +43,7 @@ export default function EditLead() {
     const [catList, setCatList] = useState<any>([])
     const [companyList, setCompanyList] = useState<any>([])
     const [expertsList, setExpertList] = useState<any>([])
-    const [singleLead, setSingleLead] = useState<any>([])
+    const [singleCustomer, setSingleLead] = useState<any>([])
     const [deletedCheck, setDeletedCheck] = useState(false)
     const [popup, setPopup] = useState(false)
     const [changeExpertPopup, setChangeExpertPopup] = useState(false)
@@ -54,8 +53,8 @@ export default function EditLead() {
     const { user } = useUser()
     const router = useRouter()
     const fetchLead = useCallback(async () => {
-        let lead = await getSingleLead(id)
-        lead.isDeleted === false ? setSingleLead(lead) : setDeletedCheck(true)
+        let lead = await getSingleCustomer(id)
+        setSingleLead(lead)
         let experts = await getExperts({ isDeleted: false })
         setExpertList(experts)
         let company = await getCompanies({ isDeleted: false })
@@ -68,31 +67,35 @@ export default function EditLead() {
     }, [fetchLead, mutated])
 
     const handleCallStatus = async (obj: any) => {
-        await addCallStatus(singleLead?._id, obj, singleLead?.expert?._id)
+        await addCallStatus(singleCustomer?._id, obj, singleCustomer?.expert?._id)
+        await editCustomer(singleCustomer?._id, {}, user?._id)
         setMutated(!mutated)
     }
     const { handleSubmit, register, reset } = useForm<FormValues>()
     const { handleSubmit: handleSubmit2, register: register2, } = useForm<FormValues2>({ values: { text: dialogText } })
-    const { handleSubmit: handleSubmit3, register: register3, setValue: setValue3, control } = useForm<FormValues3>({ values: { name: singleLead?.contactId?.name, phone_number_1: singleLead?.contactId?.phone_number_1, phone_number_2: singleLead?.contactId?.phone_number_2, email: singleLead?.contactId?.email, title: singleLead?.contactId?.title, address: singleLead?.contactId?.address, source: singleLead?.contactId?.source, description: singleLead?.contactId?.description, birthdayDate: singleLead?.contactId?.birthdayDate !== undefined ? Date.parse(singleLead?.contactId?.birthdayDate) : 0, } })
+    const { handleSubmit: handleSubmit3, register: register3, setValue: setValue3, control } = useForm<FormValues3>({ values: { name: singleCustomer?.contactId?.name, phone_number_1: singleCustomer?.contactId?.phone_number_1, phone_number_2: singleCustomer?.contactId?.phone_number_2, email: singleCustomer?.contactId?.email, title: singleCustomer?.contactId?.title, address: singleCustomer?.contactId?.address, source: singleCustomer?.contactId?.source, description: singleCustomer?.contactId?.description, birthdayDate: singleCustomer?.contactId?.birthdayDate !== undefined ? Date.parse(singleCustomer?.contactId?.birthdayDate) : 0, } })
 
 
     const handleCreateDialog = async (obj: any) => {
-        let res = await addDialog(singleLead?._id, obj.text, user?._id)
+        let res = await addDialog(singleCustomer?._id, obj.text, user?._id)
         if (!res?.error) {
+            await editCustomer(singleCustomer?._id, {}, user?._id)
             reset()
             setMutated(!mutated)
         }
     }
     const handleEditDialog = async (obj: any) => {
         let data = { text: obj.text, dialogTextId: dialogId, }
-        await editDialog(singleLead?._id, data, singleLead?.expert?._id)
+        await editDialog(singleCustomer?._id, data, singleCustomer?.expert?._id)
+        await editCustomer(singleCustomer?._id, {}, user?._id)
         setDialogId('')
         setMutated(!mutated)
     }
     const handleEditContact = async (obj: any) => {
-        obj.status = singleLead?.contactId?.status
-        let res = await editContact(singleLead?.contactId?._id, obj)
+        obj.status = singleCustomer?.contactId?.status
+        let res = await editContact(singleCustomer?.contactId?._id, obj)
         if (!res.error) {
+            await editCustomer(singleCustomer?._id, {}, user?._id)
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
@@ -100,74 +103,52 @@ export default function EditLead() {
         }
         setEditInfo(false)
     }
-    const toExpert = async (expertId: any) => {
-        let time = Date.now()
-        await addLeadToExpert(singleLead?._id, expertId)
-        await editLead(singleLead?._id, { expert: expertId, assignedAt: time, status: 'تخصیص به کارشناس' }, user?._id)
-        setMutated(!mutated)
-    }
-    const convertToCustomer = async (expertId = singleLead?.expert?._id) => {
-        let data = singleLead
-        data.expert = expertId
-        data.status = 'مشتری جدید'
-        let res = await createCustomer(data, user?._id)
-        if (res?._id !== undefined) {
-            let time = Date.now()
-            await deleteLead(singleLead?._id)
-            await addCustomerToExpert(res?._id, { assignedAt: time }, expertId)
-            await deleteLeadFromExpert(singleLead?._id, expertId)
-            router.replace('/account/leads')
-        } else {
-            toast.error('متاسفانه تبدیل سرنخ به مشتری انجام نشد')
-        }
-    }
+
     const changeStatus = async (type: string) => {
         let status = { status: type }
-        let res = await editContact(singleLead?.contactId?._id, status)
+        let res = await editContact(singleCustomer?.contactId?._id, status)
         if (!res.error) {
-            await editLead(singleLead?._id, {}, user?._id)
+            await editCustomer(singleCustomer?._id, {}, user?._id)
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
             toast.error('ridi')
         }
     }
-    let reverseArray = singleLead?.dialog?.slice()?.reverse()
-    let reverseArrayCall = singleLead?.call?.slice()?.reverse()
-    let inCall = singleLead?.call?.filter((el: any) => el.status == 'تماس ورودی')
-    let successCall = singleLead?.call?.filter((el: any) => el.status == 'تماس موفق')
-    let brokenCall = singleLead?.call?.filter((el: any) => el.status == 'تماس بی پاسخ')
-    let offCall = singleLead?.call?.filter((el: any) => el.status == 'دردسترس نبود')
-    let a = singleLead?.edits?.length > 0 ? Date.parse(singleLead?.edits[singleLead?.edits?.length - 1]?.time) : 0
-    let b = singleLead?.call?.length > 0 ? Date.parse(singleLead?.call[singleLead?.call?.length - 1]?.time) : 0
-    let c = singleLead?.dialog?.length > 0 ? Date.parse(singleLead?.dialog[singleLead?.dialog?.length - 1]?.time) : 0
+    let reverseArray = singleCustomer?.dialog?.slice()?.reverse()
+    let reverseArrayCall = singleCustomer?.call?.slice()?.reverse()
+    let inCall = singleCustomer?.call?.filter((el: any) => el.status == 'تماس ورودی')
+    let successCall = singleCustomer?.call?.filter((el: any) => el.status == 'تماس موفق')
+    let brokenCall = singleCustomer?.call?.filter((el: any) => el.status == 'تماس بی پاسخ')
+    let offCall = singleCustomer?.call?.filter((el: any) => el.status == 'دردسترس نبود')
+    let a = singleCustomer?.edits?.length > 0 ? Date.parse(singleCustomer?.edits[singleCustomer?.edits?.length - 1]?.time) : 0
+    let b = singleCustomer?.call?.length > 0 ? Date.parse(singleCustomer?.call[singleCustomer?.call?.length - 1]?.time) : 0
+    let c = singleCustomer?.dialog?.length > 0 ? Date.parse(singleCustomer?.dialog[singleCustomer?.dialog?.length - 1]?.time) : 0
     let lastActivityArr = [a, b, c]
     const lastActivityResult = lastActivityArr.reduce((c: any, d: any) => Math.max(c, d));
 
     const addToCategory = async (contactId: any) => {
-        let res = await addCustomerToCustomerCat(catId, contactId, 'lead')
+        let res = await addCustomerToCustomerCat(catId, contactId, 'customer')
         if (!res?.error) {
-            await editLead(singleLead?._id, {}, user?._id)
+            await editCustomer(singleCustomer?._id, {}, user?._id)
             setMutated(!mutated)
         }
     }
     const changeExpert = async (expertId: any) => {
-        await deleteLeadFromExpert(singleLead?._id, singleLead?.expert?._id)
-        await addLeadToExpert(singleLead?._id, expertId)
-        await editLead(singleLead?._id, { expert: expertId }, user?._id)
+        let time = Date.now()
+        await removeCustomerFromExpert(singleCustomer?._id, singleCustomer?.expert?._id)
+        await addCustomerToExpert(singleCustomer?._id, { assignedAt: time }, expertId)
+        await editCustomer(singleCustomer?._id, { expert: expertId }, user?._id)
         setMutated(!mutated)
     }
-    if (deletedCheck) {
-        return <p>این سرنخ حذف یا تبدیل گردیده است</p>
-    }
-    if (singleLead?.contactId !== undefined) {
+    if (singleCustomer?.contactId !== undefined) {
         return (
             <>
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-0">
-                        <li className="breadcrumb-item"><Link href="/account/">خانه</Link></li>
-                        <li className="breadcrumb-item"><Link href="/account/leads">لیست سرنخ ها</Link></li>
-                        <li className="breadcrumb-item active" aria-current="page">{singleLead?.contactId?.name}</li>
+                        <li className="breadcrumb-item"><Link href="/expert/">خانه</Link></li>
+                        <li className="breadcrumb-item"><Link href="/expert/customers">لیست مشتری ها</Link></li>
+                        <li className="breadcrumb-item active" aria-current="page">{singleCustomer?.contactId?.name}</li>
                     </ol>
                 </nav>
                 {popup ? <div className="popupCustome">
@@ -179,14 +160,7 @@ export default function EditLead() {
                             <option value=''>کارشناس مورد نظر را انتخاب کنید</option>
                             {expertsList?.map((expert: any, idx: number) => <option key={nanoid()} value={expert?._id} >{expert?.employe_id?.name}</option>)}
                         </select>
-                        {/* شرطی سازی دکمه ها  */}
-                        {!customerPopup ? !changeExpertPopup ?
-                            <button className="btn btn-sm bg-success text-white " disabled={expertId === ''} onClick={() => [toExpert(expertId), setPopup(false), setExpertId('')]} type="button">تخصیص به کارشناس</button>
-
-                            : <button className="btn btn-sm bg-success text-white " disabled={expertId === ''} onClick={() => [changeExpert(expertId), setPopup(false), setExpertId('')]} type="button">تغییر کارشناس</button>
-
-                            : <button className="btn btn-sm bg-success text-white " disabled={expertId === ''} onClick={() => [convertToCustomer(expertId), setPopup(false)]} type="button">تبدیل و تخصیص به کارشناس</button>}
-                        {/* پایان شرطی  */}
+                        <button className="btn btn-sm bg-success text-white " disabled={expertId === ''} onClick={() => [changeExpert(expertId), setPopup(false), setExpertId('')]} type="button">تغییر کارشناس</button>
                     </section>
                 </div> : ''}
 
@@ -197,23 +171,23 @@ export default function EditLead() {
                                 <section className="row">
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">نام و نام خانوادگی </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.name} </p> : <input type="text" className="form-control form-control-sm" {...register3('name', { required: 'نام و نام خانوادگی را وارد کنید', })} />}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.name} </p> : <input type="text" className="form-control form-control-sm" {...register3('name', { required: 'نام و نام خانوادگی را وارد کنید', })} />}
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">شماره تماس یک </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.phone_number_1} </p> : <input type="number" className="form-control form-control-sm" {...register3('phone_number_1', { required: 'شماره تماس یک را وارد کنید', })} />}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.phone_number_1} </p> : <input type="number" className="form-control form-control-sm" {...register3('phone_number_1', { required: 'شماره تماس یک را وارد کنید', })} />}
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">شماره تماس دو </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.phone_number_2} </p> : <input type="number" className="form-control form-control-sm" {...register3('phone_number_2', { required: 'شماره تماس دو را وارد کنید', })} />}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.phone_number_2} </p> : <input type="number" className="form-control form-control-sm" {...register3('phone_number_2', { required: 'شماره تماس دو را وارد کنید', })} />}
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">آدرس ایمیل </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.email !== '' ? singleLead?.contactId?.email : '---'}  </p> : <input type="text" className="form-control form-control-sm" {...register3('email')} />}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.email !== '' ? singleCustomer?.contactId?.email : '---'}  </p> : <input type="text" className="form-control form-control-sm" {...register3('email')} />}
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">منبع ورودی </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.source !== '' ? singleLead?.contactId?.source : '---'}  </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('source', e.target.value)}>
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.source !== '' ? singleCustomer?.contactId?.source : '---'}  </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('source', e.target.value)}>
                                             <option value=''>منبع ورودی را انتخاب کنید</option>
                                             <option value='سایت'>سایت</option>
                                             <option value='نمایشگاه'>نمایشگاه</option>
@@ -221,8 +195,8 @@ export default function EditLead() {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">عنوان </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.title !== '' ? singleLead?.contactId?.title : '---'} </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('title', e.target.value)}>
-                                            <option value=''>عنوان برای سرنخ  انتخاب کنید</option>
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.title !== '' ? singleCustomer?.contactId?.title : '---'} </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('title', e.target.value)}>
+                                            <option value=''>عنوان برای مشتری  انتخاب کنید</option>
                                             <option value='مدیر گروه'>مدیر گروه </option>
                                             <option value='کارشناس'>کارشناس </option>
                                             <option value='سرپرست'>سرپرست </option>
@@ -231,7 +205,7 @@ export default function EditLead() {
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">تاریخ تولد </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.birthdayDate !== '' ? convertToPersianDate(singleLead?.contactId?.birthdayDate, 'YMD') : '---'}  </p> : <div className='datePicker'>
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.birthdayDate !== '' ? convertToPersianDate(singleCustomer?.contactId?.birthdayDate, 'YMD') : '---'}  </p> : <div className='datePicker'>
                                             <Controller
                                                 control={control}
                                                 name="birthdayDate"
@@ -243,11 +217,11 @@ export default function EditLead() {
                                     <div className="col-12 col-md-6"></div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">آدرس  </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.address !== '' ? singleLead?.contactId?.address : '---'}  </p> : <textarea className="form-control form-control-sm" placeholder='آدرس کامل  ' {...register3('address')} ></textarea>}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.address !== '' ? singleCustomer?.contactId?.address : '---'}  </p> : <textarea className="form-control form-control-sm" placeholder='آدرس کامل  ' {...register3('address')} ></textarea>}
                                     </div>
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">توضیحات  </label>
-                                        {!editInfo ? <p>{singleLead?.contactId?.description !== '' ? singleLead?.contactId?.description : '---'} </p> : <textarea className="form-control form-control-sm" placeholder='توضیحات  ' {...register3('description')} ></textarea>}
+                                        {!editInfo ? <p>{singleCustomer?.contactId?.description !== '' ? singleCustomer?.contactId?.description : '---'} </p> : <textarea className="form-control form-control-sm" placeholder='توضیحات  ' {...register3('description')} ></textarea>}
                                     </div>
                                     {editInfo &&
                                         <div className="col-12 my-2">
@@ -291,41 +265,38 @@ export default function EditLead() {
                     </section>
                     <section className="col-md-4 pe-2">
                         <section className="main-body-container rounded">
-                            {singleLead?.expert !== undefined && <p className="w-100 d-flex justify-content-between align-item-center"><span>نام کارشناس: <Link href={`/account/expert/${singleLead?.expert?._id}`}> {singleLead?.expert?.employe_id?.name}</Link></span>
-                                <span onClick={() => { setPopup(true), setChangeExpertPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>}
-                            {singleLead?.assignedAt !== undefined && <p>زمان اختصاص به کارشناس <b> {convertToPersianDate(singleLead?.assignedAt, 'YMDHM')}</b></p>}
-                            <p>زمان ساخت سرنخ <b>{convertToPersianDate(singleLead?.createdAt, "YMDHM")}</b></p>
-                         {lastActivityResult !== 0 &&    <p>آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>}
+
+                            <p>زمان اختصاص به کارشناس <b> {convertToPersianDate(singleCustomer?.assignedAt, 'YMDHM')}</b></p>
+                            <p>زمان ساخت مشتری <b>{convertToPersianDate(singleCustomer?.createdAt, "YMDHM")}</b></p>
+                            <p>آخرین فعالیت روی مشتری <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>
 
                             <div className="d-flex gap-1 align-items-center mb-3">
-                                <span className="text-nowrap" >شرکت مربوطه سرنخ:</span>
-                                {singleLead?.contactId?.companyId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
+                                <span className="text-nowrap" >شرکت مربوطه مشتری:</span>
+                                {singleCustomer?.contactId?.companyId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
                                     <option value=''>یک شرکت را انتخاب کنید</option>
                                     {companyList?.map((company: any) => { return (<option key={nanoid()} value={company?._id}>{company?.name}</option>) })}
                                 </select>
-                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link>}
+                                    <button onClick={() => { addToCategory(singleCustomer?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : singleCustomer?.contactId?.companyId?.name}
                             </div>
 
                             <div className="d-flex gap-1 align-items-center mb-3">
-                                <span className="text-nowrap" >زمینه فعالیتی سرنخ:</span>
-                                {singleLead?.contactId?.categoryId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
+                                <span className="text-nowrap" >زمینه فعالیتی مشتری:</span>
+                                {singleCustomer?.contactId?.categoryId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
                                     <option value=''>یک زمینه را انتخاب کنید</option>
                                     {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
                                 </select>
-                                    <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link>}
+                                    <button onClick={() => { addToCategory(singleCustomer?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/expert/customers/categoreis/${singleCustomer?.contactId?.categoryId?._id}`}>{singleCustomer?.contactId?.categoryId?.name}</Link>}
                             </div>
                             <div className="d-flex gap-1 align-items-center mb-2">
                                 <span >وضعیت:</span>
                                 <select onChange={(e: any) => setStatus(e.target.value)} className="form-control form-control-sm">
-                                    <option value={singleLead?.contactId?.status} hidden>{singleLead?.contactId?.status}</option>
-                                    {singleLead?.contactId?.status !== 'در حال بررسی' && <option value='در حال بررسی'>در حال بررسی</option>}
-                                    {singleLead?.contactId?.status !== 'نامرتبط' && <option value='نامرتبط'>نامرتبط</option>}
-                                    {singleLead?.contactId?.status !== 'از دست رفته' && <option value='از دست رفته'>از دست رفته</option>}
-                                    {singleLead?.contactId?.status !== 'بازیابی شده' && <option value='بازیابی شده'>بازیابی شده</option>}
-                                    {singleLead?.expert == undefined && <option value='ارجاع به کارشناس'>ارجاع به کارشناس</option>}
-                                    <option value='تبدیل به مشتری'>تبدیل به مشتری</option>
+                                    <option value={singleCustomer?.contactId?.status} hidden>{singleCustomer?.contactId?.status}</option>
+                                    {singleCustomer?.contactId?.status !== 'ارسال فاکتور' && <option value='ارسال فاکتور'>ارسال فاکتور</option>}
+                                    {singleCustomer?.contactId?.status !== 'قرارحضوری' && <option value='قرارحضوری'>قرارحضوری</option>}
+                                    {singleCustomer?.contactId?.status !== 'ارسال قرارداد' && <option value='ارسال قرارداد'>ارسال قرارداد</option>}
+                                    {singleCustomer?.contactId?.status !== 'امضا قرارداد' && <option value='امضا قرارداد'>امضا قرارداد</option>}
                                 </select>
-                                <button onClick={() => { status === 'تبدیل به مشتری' ? singleLead?.expert == undefined ? [setPopup(true), setCustomerPopup(true)] : convertToCustomer() : status === 'ارجاع به کارشناس' ? setPopup(true) : changeStatus(status) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
+                                <button onClick={() => { changeStatus(status) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
                             </div>
                         </section>
                         <section className="main-body-container rounded">
@@ -340,10 +311,10 @@ export default function EditLead() {
                             <p><i className="fa fa-calendar-check-o"></i> جلسه حضوری <b>سه شنبه 12:30 الی 15:00</b></p>
                             <p><i className="fa fa-phone"></i> تماس مجدد <b>یکشنبه 12:30</b></p>
                             <p><i className="fa fa-calendar"></i> مناسبت تقویمی<b> 20 شهریور</b></p>
-                            <p><i className="fa fa-birthday-cake"></i> تولد سرنخ <b> 21 آذر</b></p>
+                            <p><i className="fa fa-birthday-cake"></i> تولد مشتری <b> 21 آذر</b></p>
                         </section>
                         <section className="main-body-container rounded">
-                            <div className="d-flex align-items-center justify-content-between mb-2"><b>تماس ها:  {singleLead.call.length} عدد</b>
+                            <div className="d-flex align-items-center justify-content-between mb-2"><b>تماس ها:  {singleCustomer.call.length} عدد</b>
                                 <div className="d-flex  gap-1">
                                     <button onClick={() => handleCallStatus('تماس ورودی')} className="btn btn-sm border-1 d-flex p-1 bg-primary text-white" type="button" title="تماس ورودی">ورودی</button>
                                     <button onClick={() => handleCallStatus('تماس موفق')} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button" title="تماس موفق">موفق</button>
