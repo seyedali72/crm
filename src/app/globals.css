@@ -33,7 +33,31 @@ body {
 .align-item-center {
   align-items: center;
 }
-
+.fs100 {
+  font-size: 1rem;
+}
+.fs90 {
+  font-size: 0.9rem;
+}
+.fs85 {
+  font-size: 0.85rem;
+}
+.fs80 {
+  font-size: 0.8rem;
+}
+.fs75 {
+  font-size: 0.75rem;
+}
+.fs70 {
+  font-size: 0.7rem;
+}
+.pTime p {
+  font-size: 0.67rem;
+  color: #404e67;
+}
+.cursorPointer {
+  cursor: pointer;
+}
 .green {
   font-size: 0.5rem;
   color: #029b3d;
@@ -249,7 +273,10 @@ th {
 #notify li:hover {
   background-color: #efefef;
 }
-#notify ul{ max-height: 70vh; overflow-y: auto;}
+#notify ul {
+  max-height: 70vh;
+  overflow-y: auto;
+}
 .notify-img {
   width: 3rem;
   border-radius: 0.1rem;

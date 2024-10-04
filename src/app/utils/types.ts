@@ -124,6 +124,7 @@ interface ICompany {
 	address?: string
 	categoryId?: Types.ObjectId
 	creator: Types.ObjectId
+	users?: [Types.ObjectId]
 	email?: string
 	status?: string
 	source?: string

@@ -1,11 +1,10 @@
 'use server'
 
-import Expert from '@/models/Expert'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Company from '@/models/Company'
-import Employe from '@/models/Employe'
 import CustomerCat from '@/models/CustomerCategory'
+import Contact from '@/models/Contact'
 
 /* ----- company ----- */
 export const getCompanies = async (search?: any) => {
@@ -64,7 +63,32 @@ export const editCompany = async (id: string, body: any, editor: string) => {
         return { error: 'خطا در تغییر کارمند' }
     }
 }
+export const addContactToCompany = async (id: string, body: any) => {
+    await connect()
 
+    try {
+        let result = await Company.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
+        await Contact.findByIdAndUpdate(body, { companyId: result?._id })
+
+        return JSON.parse(JSON.stringify(result))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+
+export const editContactCompany = async (id: string, body: any, lastCompanyId: any) => {
+    await connect()
+    try {
+        let remove = await Company.findByIdAndUpdate(lastCompanyId, { $pull: { users: body } }, { new: true })
+        let add = await Company.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
+        let res = await Contact.findByIdAndUpdate(body, { companyId: add?._id })
+        return JSON.parse(JSON.stringify(res))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
 
 export const deleteCompany = async (companyId: string) => {
     await connect()

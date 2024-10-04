@@ -50,24 +50,6 @@ export const createCustomerCat = async (body: any) => {
     }
 }
 
-export const addCustomerToCustomerCat = async (id: string, body: any, type: string) => {
-    await connect()
-
-    try {
-        let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
-         if (type == 'company') {
-            await Company.findByIdAndUpdate(body, { categoryId: result?._id })
-        } else {
-            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
-        }
-
-        return JSON.parse(JSON.stringify(result))
-    } catch (error) {
-        console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
-    }
-}
-
 export const editCustomerCat = async (id: string, body: any) => {
     await connect()
     try {
@@ -94,5 +76,42 @@ export const deleteCustomerCat = async (customerCatId: string) => {
     } catch (error) {
         console.log(error)
         return { error: 'خطا در پاک کردن کارمند' }
+    }
+}
+
+export const addCustomerToCustomerCat = async (id: string, body: any, type: string) => {
+    await connect()
+
+    try {
+        let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
+        if (type == 'company') {
+            await Company.findByIdAndUpdate(body, { categoryId: result?._id })
+        } else {
+            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
+        }
+
+        return JSON.parse(JSON.stringify(result))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+
+export const editCustomerFromCustomerCat = async (id: string, body: any, type: string, last: any) => {
+    await connect()
+
+    try {
+        let remove = await CustomerCat.findByIdAndUpdate(last, { $pull: { users: body } }, { new: true })
+        let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
+        if (type == 'company') {
+            await Company.findByIdAndUpdate(body, { categoryId: result?._id })
+        } else {
+            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
+        }
+
+        return JSON.parse(JSON.stringify(result))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
     }
 }
