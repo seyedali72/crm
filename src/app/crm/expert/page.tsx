@@ -11,7 +11,7 @@ export default function Home() {
     const [mutated, setMutated] = useState(false)
 
     const fetchExpertsList = useCallback(async () => {
-        let experts = await getExperts({})
+        let experts = await getExperts({ role: 4 })
         setExpertsList(experts)
     }, [])
 
@@ -26,7 +26,7 @@ export default function Home() {
         <>
             <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
-                    <li className="breadcrumb-item "><Link href="/account/">داشبورد</Link></li>
+                    <li className="breadcrumb-item "><Link href="/crm/">داشبورد</Link></li>
                     <li className="breadcrumb-item active" aria-current="page"> لیست کارشناس ها </li>
                 </ol>
             </nav>
@@ -35,7 +35,7 @@ export default function Home() {
                     <div className="col-md-6">
                         <input type="text" onChange={(e: any) => setFilter(e.target.value)} placeholder='فیلتر براساس نام یا شماره ملی ' className="form-control form-control-sm" />
                     </div>
-                    <Link href="/account/expert/create" className="btn bg-success text-white btn-sm" >
+                    <Link href="/crm/expert/create" className="btn bg-success text-white btn-sm" >
                         افزودن کارشناس جدید
                     </Link>
                 </section>
@@ -67,8 +67,8 @@ export default function Home() {
                                         <td>{expert?.leads?.length}</td>
                                         <td>{expert?.customers?.length}</td>
                                         <td className="text-center">
-                                            <Link href={`/account/expert/${expert?._id}`} className="btn btn-sm bg-custom-2  ms-1" ><i className="fa fa-book px-1"></i>پرونده</Link>
-                                            <Link href={`/account/expert/edit/${expert?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>ویرایش</Link>
+                                            <Link href={`/crm/expert/${expert?._id}`} className="btn btn-sm bg-custom-2  ms-1" ><i className="fa fa-book px-1"></i>پرونده</Link>
+                                            <Link href={`/crm/expert/edit/${expert?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>ویرایش</Link>
                                             <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(expert?._id)} />, { autoClose: false, })}>
                                                 <i className="fa fa-trash px-1"></i>حذف
                                             </button>

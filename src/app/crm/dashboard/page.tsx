@@ -1,4 +1,4 @@
-import StatisticsDashboard from "../components/Static_Dashboard";
+import StatisticsDashboard from "../../components/Static_Dashboard";
 
  
 export default function ExpertDashboard() {
@@ -14,7 +14,7 @@ export default function ExpertDashboard() {
           </section>
 
           <section className="main-body-description">
-            expert
+            seller team manager
           </section>
 
         </section>

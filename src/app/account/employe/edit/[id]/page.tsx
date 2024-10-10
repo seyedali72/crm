@@ -105,8 +105,8 @@ export default function Home() {
             <div className="col-12 col-md-4 mb-2">
               <label className='my-1' htmlFor="">دپارتمان</label>
               <select className="form-control form-control-sm" defaultValue={singleEmploye?.department_id?._id} onChange={(e: any) => { setValue('department_id', e.target.value), setDepartment(e.target.value) }} >
-                {department !== '' ? <option value={singleEmploye?.department_id?._id}>{singleEmploye?.department_id?.name}</option> : <option value=''>دپارتمان مورد نظر را انتخاب کنید</option>}
-                {departments?.map((department: any, idx: number) => department?._id !== singleEmploye?.department_id?._id && <option key={idx} value={department?._id} >{department?.name}</option>)}
+                {department !== '' ? <option value={singleEmploye?.department_id !== undefined ? singleEmploye?.department_id?._id : ''} hidden>{singleEmploye?.department_id !== undefined ? singleEmploye?.department_id?.name : 'بدون گروه'}</option> : <option value='' hidden>دپارتمان مورد نظر را انتخاب کنید</option>}
+                {departments?.map((department: any, idx: number) => <option key={idx} value={department?._id} >{department?.name}</option>)}
               </select>
             </div>
             <div className="col-12 col-md-4 mb-2">

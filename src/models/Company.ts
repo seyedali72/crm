@@ -20,7 +20,7 @@ const baseCompanySchema = new Schema<ICompany, Model<ICompany, any, any>, any>(
 		users: [{ type: Schema.Types.ObjectId, ref: 'Contatct' }],
 		description: { type: String },
 		categoryId: { type: Schema.Types.ObjectId, ref: 'CustomerCategory' },
-		creator: { type: Schema.Types.ObjectId, ref: 'User' },
+		creator: { type: Schema.Types.ObjectId, ref: 'Expert' },
 		address: { type: String },
 		email: { type: String, trim: true, },
 		isDeleted: { type: Boolean, required: true, default: false },

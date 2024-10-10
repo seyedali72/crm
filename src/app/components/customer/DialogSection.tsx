@@ -13,7 +13,7 @@ interface FormValues {
 interface FormValues2 {
     text: string
 }
-export default function DialogSectionCus({ singleCustomer, mutated }: any) {
+export default function DialogSectionCus({ singleCustomer, mutated,owner }: any) {
     const { user } = useUser()
     const [dialogText, setDialogText] = useState('')
     const [dialogId, setDialogId] = useState('')
@@ -41,10 +41,10 @@ export default function DialogSectionCus({ singleCustomer, mutated }: any) {
     return (
         <section className="main-body-container rounded">
         <h5>لیست مکالمات</h5>
-        <form className="w-100" action="post" onSubmit={handleSubmit(handleCreateDialog)}>
+       {owner &&  <form className="w-100" action="post" onSubmit={handleSubmit(handleCreateDialog)}>
             <textarea className="form-control input-group" rows={1} placeholder='خلاصه مکالمه' {...register('text', { required: 'متن مکالمه را وارد کنید', })} ></textarea>
             <button type="submit" style={{ margin: '10px 0', padding: '5px 20px', backgroundColor: '#1199', border: 'unset', borderRadius: 5, color: '#fff', fontSize: 14, cursor: 'pointer' }}>ثبت</button>
-        </form>
+        </form>}
         {reverseArray?.map((el: any ) => {
             if (el._id !== dialogId) {
                 return (
@@ -54,7 +54,7 @@ export default function DialogSectionCus({ singleCustomer, mutated }: any) {
                             <div className="d-flex w-100 justify-content-between"  ><p className="mb-0">{convertToPersianDate(el.time, 'YMDHM')}</p>
                                 {el?.editedTime && <p className="mb-0"><i className="fa fa-edit mx-1"></i> {convertToPersianDate(el?.editedTime, 'YMDHM')}</p>}</div>
                         </div>
-                        <div><button type="button" className="btn btn-sm bg-primary text-white mx-1" onClick={() => [setDialogId(el?._id), setDialogText(el?.text)]}>ویرایش</button></div>
+                        <div>{owner && <button type="button" className="btn btn-sm bg-primary text-white mx-1" onClick={() => [setDialogId(el?._id), setDialogText(el?.text)]}>ویرایش</button>}</div>
                     </div>
                 )
             } else {

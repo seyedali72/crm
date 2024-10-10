@@ -1,7 +1,7 @@
-import StatisticsDashboard from "../components/Static_Dashboard";
+import StatisticsDashboard from "../../components/Static_Dashboard";
 
  
-export default function home() {
+export default function ExpertDashboard() {
   return (
     < >
       <StatisticsDashboard />
@@ -14,7 +14,7 @@ export default function home() {
           </section>
 
           <section className="main-body-description">
-            account
+            expert
           </section>
 
         </section>

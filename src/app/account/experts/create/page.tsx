@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 interface FormValues1 {
     user_name: string
     status: string
-    roles: string
+    role: number
     password: string
     teams: string
     employe_id: string
@@ -41,7 +41,7 @@ export default function Home() {
                 toast.success('انجام شد')
                 setMutated(!mutated)
                 reset()
-                router.replace('/account/expert')
+                router.replace('/account/experts')
             } else {
                 toast.error('ridi')
             }
@@ -61,7 +61,7 @@ export default function Home() {
             <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                     <li className="breadcrumb-item "><Link href="/account/">داشبورد</Link></li>
-                    <li className="breadcrumb-item "> <Link href="/account/expert"> کارشناس ها</Link> </li>
+                    <li className="breadcrumb-item "> <Link href="/account/experts"> کارشناس ها</Link> </li>
                     <li className="breadcrumb-item  active" aria-current="page"> افزودن کارشناس جدید </li>
                 </ol>
             </nav>
@@ -70,13 +70,13 @@ export default function Home() {
                     <section className="row">
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">کارمند  </label>
-                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('employe_id', e.target.value)}><option value=''>کارمند را انتخاب کنید</option>
+                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('employe_id', e.target.value)}><option value='' hidden>کارمند را انتخاب کنید</option>
                                 {EmployesList?.map((user: any, idx: number) => { if (checkedUser(user?._id)) { return (<option key={idx} value={user?._id}>{user?.name}</option>) } })}
                             </select>
                         </div>
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">گروه فعالیتی </label>
-                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('teams', e.target.value)}><option value=''>گروه را انتخاب کنید</option>
+                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('teams', e.target.value)}><option value='' hidden>گروه را انتخاب کنید</option>
                                 {teamsList?.map((team: any, idx: number) => { return (<option key={idx} value={team?._id}>{team?.name}</option>) })}
                             </select>
                         </div>
@@ -92,7 +92,7 @@ export default function Home() {
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">وضعیت کارمند </label>
                             <select className="form-control form-control-sm" onChange={(e: any) => setValue('status', e.target.value)}>
-                                <option value=''>وضعیت کارمند را انتخاب کنید</option>
+                                <option value='' hidden>وضعیت کارمند را انتخاب کنید</option>
                                 <option value='همکاری'>در حال همکاری</option>
                                 <option value='قطع همکاری'>قطع همکاری</option>
                             </select>
@@ -100,12 +100,15 @@ export default function Home() {
 
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">سطح دسترسی </label>
-                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('roles', e.target.value)}>
-                                <option value=''>سطح دسترسی کارشناس را انتخاب کنید</option>
-                                <option value='مدیر گروه'>مدیر گروه </option>
-                                <option value='کارشناس'>کارشناس </option>
-                                <option value='سرپرست'>سرپرست </option>
-                                <option value='کاربر'>کاربر </option>
+                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('role', e.target.value)}>
+                                <option value='' hidden>سطح دسترسی کارشناس را انتخاب کنید</option>
+                                <option value={2}>مدیر فروش </option>
+                                <option value={3}>مدیر منابع انسانی </option>
+                                <option value={4}>کارمند فروش </option>
+                                <option value={5}>کارمند منابع انسانی </option>
+                                <option value={6}>مدیر تدارکات </option>
+                                <option value={7}>مسئول خرید </option>
+                                <option value={8}>کاربر </option>
                             </select>
                         </div>
 

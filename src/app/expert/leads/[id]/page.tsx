@@ -15,6 +15,7 @@ import persian_fa from "react-date-object/locales/persian_fa"
 import { Controller, useForm } from "react-hook-form"
 import DatePicker from "react-multi-date-picker"
 import { toast } from "react-toastify"
+import { useUser } from "@/app/context/UserProvider"
 
 interface FormValues3 {
     name: string
@@ -32,13 +33,18 @@ export default function EditLead() {
     const [singleLead, setSingleLead] = useState<any>([])
     const [deletedCheck, setDeletedCheck] = useState(false)
     const [popup, setPopup] = useState(false)
+    const [owner, setOwner] = useState(false)
     const [customerPopup, setCustomerPopup] = useState(false)
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
+    const { user } = useUser()
     const fetchLead = useCallback(async () => {
-        let lead = await getSingleLead(id)
-        lead.isDeleted === false ? setSingleLead(lead) : setDeletedCheck(true)
-    }, [])
+        if (user?._id !== undefined) {
+            let lead = await getSingleLead(id)
+            lead?.expert?._id == undefined ? setOwner(true) : lead?.expert?._id == user?._id ? setOwner(true) : setOwner(false)
+            lead.isDeleted === false ? setSingleLead(lead) : setDeletedCheck(true)
+        }
+    }, [user])
     useEffect(() => {
         fetchLead()
     }, [fetchLead, mutated])
@@ -142,12 +148,12 @@ export default function EditLead() {
                                     <button type='button' onClick={() => setEditInfo(!editInfo)} className="btn btn-primary btn-sm">درخواست ویرایش</button>
                                 </div>}
                         </section>
-                        <DialogSection singleLead={singleLead} mutated={() => setMutated(!mutated)} />
+                        <DialogSection owner={owner} singleLead={singleLead} mutated={() => setMutated(!mutated)} />
                     </section>
                     <section className="col-md-4 pe-2">
-                        <MoreInfo singleLead={singleLead} mutated={() => setMutated(!mutated)} popUp={() => setPopup(!popup)} customerPopup={() => setCustomerPopup(!customerPopup)} />
-                        <ReminderSection singleLead={singleLead} mutated={() => setMutated(!mutated)} />
-                        <CallLogSection singleLead={singleLead} mutated={() => setMutated(!mutated)} />
+                        <MoreInfo owner={owner} singleLead={singleLead} mutated={() => setMutated(!mutated)} popUp={() => setPopup(!popup)} customerPopup={() => setCustomerPopup(!customerPopup)} />
+                        <ReminderSection owner={owner} singleLead={singleLead} mutated={() => setMutated(!mutated)} />
+                        <CallLogSection owner={owner} singleLead={singleLead} mutated={() => setMutated(!mutated)} />
                     </section>
                 </section>
             </>

@@ -60,8 +60,8 @@ export default function CreateUser() {
                             <label className='my-1' htmlFor="">سطح دسترسی </label>
                             <select className="form-control form-control-sm" required onChange={(e: any) => { setValue('role', e.target.value) }}>
                                 <option value='' hidden>یک گزینه را انتخاب کنید</option>
-                                <option value={2}>مدیر</option>
-                                <option value={3}>ادمین</option>
+                                <option value={1}>مدیر</option>
+                                <option value={0}>ادمین</option>
                             </select>
                         </div>
                         <div className="col-12 col-md-6">

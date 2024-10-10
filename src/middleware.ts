@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function redirect_to(role: number) {
-	return role === 1
+	return role === 0
 		? '/pishkhan'
-		: role === 2
-			? '/account'
-			: role === 9
-				? '/expert'
+		: role === 1
+			? '/account/dashboard'
+			: role === 2
+				? '/crm/dashboard'
 				: role === 3
-					? '/employee'
-					: role === 0
-						? '/auth/signin'
-						: '/account';
+					? '/hrm/dashboard'
+					: role === 4
+						? '/expert/dashboard'
+						: role === 5
+							? '/expert/dashboard'
+							: role === 0
+								? '/auth/signin'
+								: '/account';
 }
 
 export function sendTo(request: any, role: number) {
@@ -31,17 +35,20 @@ export function middleware(request: NextRequest) {
 			return NextResponse.next();
 		}
 		return sendTo(request, 0);
-	} else if (request.nextUrl.pathname.includes('account/')) {
+	} else if (request.nextUrl.pathname.includes('crm/')) {
 		if (role === 2) return NextResponse.next();
 		return sendTo(request, role);
 	} else if (request.nextUrl.pathname.includes('expert/')) {
-		if (role === 9) return NextResponse.next();
+		if (role === 4) return NextResponse.next();
 		return sendTo(request, role);
-	} else if (request.nextUrl.pathname.includes('servicer/')) {
+	} else if (request.nextUrl.pathname.includes('expert/')) {
+		if (role === 5) return NextResponse.next();
+		return sendTo(request, role);
+	} else if (request.nextUrl.pathname.includes('hrm/')) {
 		if (role === 3) return NextResponse.next();
 		return sendTo(request, role);
-	} else if (request.nextUrl.pathname.includes('pishkhan/')) {
-		if (role === 8) return NextResponse.next();
+	} else if (request.nextUrl.pathname.includes('account/')) {
+		if (role === 1) return NextResponse.next();
 		return sendTo(request, role);
 	} else {
 		// stop loggedin user from going to signup/signin page

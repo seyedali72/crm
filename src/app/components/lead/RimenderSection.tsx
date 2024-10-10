@@ -19,17 +19,17 @@ interface FormValues1 {
     description: string
     schedule: Date
 }
-export default function ReminderSection({ singleLead, mutated }: any) {
+export default function ReminderSection({ singleLead, mutated, owner }: any) {
     const [reminderId, setReminderId] = useState<any>()
     const [typeReminder, setTypeReminder] = useState('')
     const [reminderPopup, setReminderPopup] = useState(false)
     const [edited, setEdited] = useState(false)
     const { user } = useUser()
+    const [reminders, setReminders] = useState<any>([])
     const { handleSubmit, register, reset, control } = useForm<FormValues>()
     const { handleSubmit: handleSubmit1, register: register1, reset: reset1, control: control1 } = useForm<FormValues1>()
-    const [reminders, setReminders] = useState<any>([])
     const fetchData = useCallback(async () => {
-        let data = await getReminders({ expertId: user?._id, isDeleted: false, leadId: singleLead?._id })
+        let data = await getReminders({  isDeleted: false, leadId: singleLead?._id })
         setReminders(data)
     }, [])
     const handleCreateReminder = async (obj: any) => {
@@ -79,9 +79,9 @@ export default function ReminderSection({ singleLead, mutated }: any) {
                                 <label className="my-1" >توضیحات اضافی</label>
                                 <textarea className="form-control" placeholder="توضیحات اضافی" defaultValue={reminderId?.description} {...register('description')} ></textarea>
                             </div>
-                            <div className="col-12"><button type="submit" className="btn w-100 btn-sm bg-custom-2 text-white px-3" >ثبت ویرایش</button></div>
+                            {owner && <div className="col-12"><button type="submit" className="btn w-100 btn-sm bg-custom-2 text-white px-3" >ثبت ویرایش</button></div>}
                         </form>
-                        <div className="col-12"><button type="button" onClick={() => complateReminder()} className="btn mt-2 w-100 btn-sm bg-custom-4 text-white px-3" >تکمیل یادآور</button></div>
+                        {owner && <div className="col-12"><button type="button" onClick={() => complateReminder()} className="btn mt-2 w-100 btn-sm bg-custom-4 text-white px-3" >تکمیل یادآور</button></div>}
                     </section>
                     : <section className="main-body-container rounded">
                         <div className="d-flex justify-content-between"> <h5>زمان یادآوری را مشخص کنید</h5>
@@ -112,12 +112,12 @@ export default function ReminderSection({ singleLead, mutated }: any) {
             </div>}
             <section className="main-body-container rounded">
                 <div className="d-flex justify-content-between mb-2"> <b>یادآور</b>
-                    <div className="d-flex gap-1 align-items-center">
+                    {owner && <div className="d-flex gap-1 align-items-center">
                         <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('مناسبت تقویمی') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar"></i></button>
                         <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('تماس تلفنی') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-phone"></i></button>
                         <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('مناسبت تولد') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-birthday-cake"></i></button>
                         <button onClick={() => { setReminderPopup(!reminderPopup), setTypeReminder('جلسه حضوری') }} className="btn btn-sm border-1 d-flex p-1 bg-success text-white" type="button"><i className="fa fa-calendar-check-o"></i></button>
-                    </div>
+                    </div>}
                 </div>
                 {reminders?.map((reminder: any) => {
                     return (<p key={nanoid()} className="mb-1 py-1 cursorPointer fs90" onClick={() => { setReminderId(reminder), setReminderPopup(!reminderPopup), setEdited(!edited) }}><i className={`fa ${reminder?.type == 'مناسبت تقویمی' ? 'fa-calendar' : reminder?.type == 'مناسبت تولد' ? 'fa-birthday-cake' : reminder?.type == 'تماس تلفنی' ? 'fa-phone' : 'fa-calendar-check-o'}`}></i>{' '}{reminder?.type}{' '}<b>{convertToPersianDate(reminder?.schedule, 'YYMDHM')}</b></p>)

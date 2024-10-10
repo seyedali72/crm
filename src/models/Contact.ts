@@ -14,7 +14,7 @@ const baseContactSchema = new Schema<IContact, Model<IContact, any, any>, any>(
 		description: { type: String },
 		categoryId: { type: Schema.Types.ObjectId, ref: 'CustomerCategory' },
 		companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
-		creator: { type: Schema.Types.ObjectId, ref: 'Client' },
+		creator: { type: Schema.Types.ObjectId, ref: 'Employe' },
 		address: { type: String },
 		email: { type: String, trim: true, },
 		birthdayDate: { type: Date },

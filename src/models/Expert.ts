@@ -10,7 +10,7 @@ const baseExpertSchema = new Schema<IExpert, Model<IExpert, any, any>, any>(
 		status: { type: String, trim: true, default: 'غیرفعال' },
 		password: { type: String, trim: true },
 		title: { type: String, trim: true },
-		roles: { type: String, trim: true },
+		role: { type: Number, trim: true },
 		teams: { type: Schema.Types.ObjectId, ref: 'Team' },
 		description: { type: String, trim: true },
 		leads: [{ type: Schema.Types.ObjectId, ref: 'Lead' }],

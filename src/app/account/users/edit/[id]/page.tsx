@@ -61,9 +61,9 @@ export default function EditUser() {
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">سطح دسترسی </label>
                             <select className="form-control form-control-sm" defaultValue={singleClient?.role} onChange={(e: any) => { setValue('role', e.target.value) }}>
-                                <option value={singleClient?.role} hidden>{singleClient?.role == 2 ? 'مدیر' : 'ادمین'}</option>
-                                <option value={2}>میر</option>
-                                <option value={3}>ادمین</option>
+                                <option value={singleClient?.role} hidden>{singleClient?.role == 1 ? 'مدیر' : 'ادمین'}</option>
+                                <option value={1}>مدیر</option>
+                                <option value={0}>ادمین</option>
                             </select>
                         </div>
                         <div className="col-12 col-md-6">

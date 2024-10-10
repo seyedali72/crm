@@ -13,7 +13,7 @@ interface FormValues2 {
 interface FormValues {
     text: string
 }
-export default function DialogSection({ singleLead, mutated }: any) {
+export default function DialogSection({ singleLead, mutated, owner }: any) {
     const { user } = useUser()
     const [dialogId, setDialogId] = useState('')
     const [dialogText, setDialogText] = useState('')
@@ -37,10 +37,10 @@ export default function DialogSection({ singleLead, mutated }: any) {
     return (
         <section className="main-body-container rounded">
             <h5>لیست مکالمات</h5>
-            <form className="w-100" action="post" onSubmit={handleSubmit(handleCreateDialog)}>
+            {owner && <form className="w-100" action="post" onSubmit={handleSubmit(handleCreateDialog)}>
                 <textarea className="form-control input-group fs90" rows={1} placeholder='خلاصه مکالمه' {...register('text', { required: 'متن مکالمه را وارد کنید' })} ></textarea>
                 <button type="submit" className="my-2 py-1 px-3 rounded-2 text-white fs90 cursorPointer border-0 bg-success">ثبت</button>
-            </form>
+            </form>}
             {reverseArray?.map((el: any) => {
                 if (el._id !== dialogId) {
                     return (
@@ -52,7 +52,7 @@ export default function DialogSection({ singleLead, mutated }: any) {
                                     {el?.editedTime && <p className="mb-0">زمان ویرایش: {convertToPersianDate(el?.editedTime, 'YMDHM')}</p>}
                                 </div>
                             </div>
-                            <div><button type="button" className="btn btn-sm bg-primary text-white mx-1" onClick={() => [setDialogId(el?._id), setDialogText(el?.text)]}>ویرایش</button></div>
+                            <div>{owner && <button type="button" className="btn btn-sm bg-primary text-white mx-1" onClick={() => [setDialogId(el?._id), setDialogText(el?.text)]}>ویرایش</button>}</div>
                         </div>
                     )
                 } else {

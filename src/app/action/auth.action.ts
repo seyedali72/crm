@@ -11,7 +11,7 @@ export const signinUser = async (body: any) => {
 	await connect()
 	try {
 		const found = await User.findOne({
-			isDeleted: false, role:1,
+			isDeleted: false,  
 			user_name: body.user_name,
 			password: body.password,
 		})
@@ -28,7 +28,7 @@ export const signinUser = async (body: any) => {
 export const signupUser = async (body: any) => {
 	await connect()
 	try {
-		const newUser = await User.create({ user_name: body.user_name, name: nanoid(), password: body.password, role: 1 })
+		const newUser = await User.create({ user_name: body.user_name, name: nanoid(), password: body.password, role: body.role })
 		cookies().set('user', JSON.stringify(newUser))
 		return JSON.parse(JSON.stringify(newUser))
 	} catch (error) {
@@ -38,11 +38,11 @@ export const signupUser = async (body: any) => {
 }
 
 export const signinClient = async (body: any) => {
-
+console.log('signinClient')
 	await connect()
 	try {
 		const found = await Client.findOne({
-			isDeleted: false, role:2,
+			isDeleted: false, 
 			user_name: body.user_name,
 			password: body.password,
 		})
@@ -57,9 +57,10 @@ export const signinClient = async (body: any) => {
 }
 
 export const signupClient = async (body: any) => {
+console.log('signupClient')
 	await connect()
 	try {
-		const newUser = await Client.create({ user_name: body.user_name, name: nanoid(), password: body.password, mobile_number: body.mobile_number, role: 2 })
+		const newUser = await Client.create({ user_name: body.user_name, name: nanoid(6), password: body.password, mobile_number: body.mobile_number, role: body.role})
 		cookies().set('user', JSON.stringify(newUser))
 		return JSON.parse(JSON.stringify(newUser))
 	} catch (error) {

@@ -5,6 +5,7 @@ import { buildQuery } from '../utils/helpers'
 import Company from '@/models/Company'
 import CustomerCat from '@/models/CustomerCategory'
 import Contact from '@/models/Contact'
+import Expert from '@/models/Expert'
 
 /* ----- company ----- */
 export const getCompanies = async (search?: any) => {

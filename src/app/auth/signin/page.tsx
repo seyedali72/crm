@@ -1,7 +1,7 @@
 'use client'
 
 import { signinClient, signupClient } from '@/app/action/auth.action'
-import { useState } from 'react'
+import {  useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useUser } from '../../context/UserProvider'
@@ -23,28 +23,35 @@ export default function LoginForm() {
   const [securityCode, setSecurityCode] = useState('')
   const [admin, setAdmin] = useState(false)
   const router = useRouter()
-  const { user, updateUser } = useUser()
+  const {  updateUser } = useUser()
 
   const handleSignupUser = async (obj: any) => {
-    const result = toggle ?
-      admin ? await signupClient(obj) : await signinExpert(obj) :
-      admin ? await signinClient(obj) : await signinExpert(obj)
-
+    const result = toggle ? await signupClient(obj) : admin ? await signinClient(obj) : await signinExpert(obj)
     if (result.error) {
       toast.error(result.error)
     } else {
       toast.success('انجام شد')
       updateUser(result)
-      result.role === 9
-        ? router.replace(`/expert`) // after login client expert user
-        : result.role === 2
-          ? router.replace('/account') // after login client admin
-          : router.replace('/account/expert') // after login  admin
+      result.role === 2
+        ? router.replace(`/crm/dashboard`) // after login client manager crm
+        : result.role === 4
+          ? router.replace(`/expert/dashboard`) // after login client expert user
+          : result.role === 1
+            ? router.replace('/account/dashboard') // after login client admin
+            : router.replace('/account/experts') // after login  admin
     }
 
     // useEffect(() => {
-    //   if (user?._id) redirect('/leads')
-    // }, [])
+    //   if (user?._id !== undefined) {
+    //     result.role === 2
+    //       ? router.replace(`/crm/dashboard`) // after login client manager crm
+    //       : result.role === 4
+    //         ? router.replace(`/expert/dashboard`) // after login client expert user
+    //         : result.role === 1
+    //           ? router.replace('/account/dashboard') // after login client admin
+    //           : router.replace('/account/experts') // after login  admin
+    //   }
+    // }, [user])
   }
   return (
     <div className='d-flex flex-column  gap-3 py-5 px-5 justify-content-center align-item-center loginBackground' >

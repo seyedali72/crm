@@ -37,9 +37,9 @@ export default function ExpertDetail() {
         <>
             <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
-                    <li className="breadcrumb-item"><Link href="/account/">خانه</Link></li>
-                    <li className="breadcrumb-item"><Link href="/account/expert">لیست کارشناس ها</Link></li>
-                    <li className="breadcrumb-item"><Link href={`/account/expert/edit/${singleExpert?._id}`}>کارشناس: {singleExpert?.employe_id?.name}</Link></li>
+                    <li className="breadcrumb-item"><Link href="/crm/">خانه</Link></li>
+                    <li className="breadcrumb-item"><Link href="/crm/expert">لیست کارشناس ها</Link></li>
+                    <li className="breadcrumb-item"><Link href={`/crm/expert/edit/${singleExpert?._id}`}>کارشناس: {singleExpert?.employe_id?.name}</Link></li>
                     <li className="breadcrumb-item active" aria-current="page">داشبورد</li>
                 </ol>
             </nav>
@@ -75,7 +75,7 @@ export default function ExpertDetail() {
                                                 <td>{customer?.contactId?.phone_number_1}</td>
                                                 <td>{customer?.call?.length}</td>
                                                 <td className="  text-center">
-                                                    <Link href={`/account/customers/${customer?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>پرونده</Link>
+                                                    <Link href={`/crm/customers/${customer?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>پرونده</Link>
                                                     <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDeleteCustomer(customer?._id)} />, { autoClose: false, })}>
                                                         <i className="fa fa-trash px-1"></i>حذف
                                                     </button>
@@ -109,7 +109,7 @@ export default function ExpertDetail() {
                                                 <td>{lead?.contactId?.phone_number_1}</td>
                                                 <td>{lead?.call?.length}</td>
                                                 <td className="  text-center">
-                                                    <Link href={`/account/leads/${lead?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>پرونده</Link>
+                                                    <Link href={`/crm/leads/${lead?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>پرونده</Link>
                                                     <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDeleteLead(lead?._id)} />, { autoClose: false, })}>
                                                         <i className="fa fa-trash px-1"></i>حذف
                                                     </button>

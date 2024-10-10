@@ -14,9 +14,10 @@ import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-export default function MoreInfo({ singleLead, mutated }: any) {
+export default function MoreInfo({ singleLead, mutated, owner }: any) {
     const [companyList, setCompanyList] = useState<any>([])
     const [catList, setCatList] = useState<any>([])
+    const [popup, setPopup] = useState(false)
     const [edited, setEdited] = useState(false)
     const [editedCat, setEditedCat] = useState(false)
     const [status, setStatus] = useState('')
@@ -93,17 +94,27 @@ export default function MoreInfo({ singleLead, mutated }: any) {
     useEffect(() => { fetchData() }, [fetchData])
     return (
         <section className="main-body-container rounded">
+            {!owner ? singleLead?.expert !== undefined ?
+                <p className="w-100 d-flex justify-content-between align-item-center"><span>نام کارشناس: <Link href={`/account/expert/${singleLead?.expert?._id}`}> {singleLead?.expert?.employe_id?.name}</Link></span>
+                    <span onClick={() => { setPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>
+
+                : <p className="w-100 d-flex justify-content-between align-item-center"><span>بدون کارشناس</span>
+                    <span onClick={() => { setPopup(true) }} className="text-danger cursorPointer">تعریف کارشناس</span></p>: ''}
+
             {singleLead?.assignedAt !== undefined && <p className="fs90">زمان اختصاص به کارشناس <b> {convertToPersianDate(singleLead?.assignedAt, 'YYMDHM')}</b></p>}
             <p className="fs90">زمان ساخت سرنخ <b>{convertToPersianDate(singleLead?.createdAt, "YYMDHM")}</b></p>
             {lastActivityResult !== 0 && <p className="fs90">آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YYMDHM")}  </b></p>}
 
             <div className="d-flex gap-1 align-items-center mb-3 fs90 text-nowrap">
                 <span className="text-nowrap" >شرکت مربوطه سرنخ:</span>
-                {singleLead?.contactId?.companyId == undefined ? <>  <select onChange={(e: any) => setCompanyId(e.target.value)} className="form-control form-control-sm fs80">
-                    <option value='' hidden className="fs80">یک شرکت را انتخاب کنید</option>
-                    {companyList?.map((company: any) => { return (<option className="fs80" key={nanoid()} value={company?._id}>{company?.name}</option>) })}
-                </select>
-                    <button onClick={() => { addToCompany(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></>
+                {singleLead?.contactId?.companyId == undefined ?
+                    owner ? <>
+                        <select onChange={(e: any) => setCompanyId(e.target.value)} className="form-control form-control-sm fs80">
+                            <option value='' hidden className="fs80">یک شرکت را انتخاب کنید</option>
+                            {companyList?.map((company: any) => { return (<option className="fs80" key={nanoid()} value={company?._id}>{company?.name}</option>) })}
+                        </select>
+                        <button onClick={() => { addToCompany(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
+                    </> : <b>تعریف نشده است</b>
                     : edited ?
                         <>
                             <select onChange={(e: any) => setCompanyId(e.target.value)} className="form-control form-control-sm fs80">
@@ -111,20 +122,21 @@ export default function MoreInfo({ singleLead, mutated }: any) {
                                 {companyList?.map((company: any) => { return (<option key={nanoid()} value={company?._id}>{company?.name}</option>) })}
                             </select>
                             <i onClick={() => { changeCompany(singleLead?.contactId?._id) }} className="fa fa-check p-1 rounded-1 cursorPointer bg-success text-white"> </i>
-                            <i onClick={() => { setEdited(!edited) }} className="fa fa-times p-1 rounded-1 cursorPointer bg-danger text-white"> </i></> : <><Link href={`/expert/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link><i onClick={() => setEdited(!edited)} className="fa fa-edit cursorPointer w-100 text-start"></i>
+                            <i onClick={() => { setEdited(!edited) }} className="fa fa-times p-1 rounded-1 cursorPointer bg-danger text-white"> </i></> : <><Link href={`/expert/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link>{owner && <i onClick={() => setEdited(!edited)} className="fa fa-edit cursorPointer w-100 text-start"></i>}
                         </>}
             </div>
 
             <div className="d-flex gap-1 align-items-center mb-3 fs90">
                 <span className="text-nowrap" >زمینه فعالیتی سرنخ:</span>
                 {singleLead?.contactId?.categoryId == undefined ?
-                    <>
+                    owner ? <>
                         <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
-                            <option value=''>یک زمینه را انتخاب کنید</option>
+                            <option value='' hidden>یک زمینه را انتخاب کنید</option>
                             {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
                         </select>
                         <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
-                    </> : editedCat ? <>
+                    </> : <b>تعریف نشده است</b>
+                    : editedCat ? <>
                         <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
                             <option value='' hidden>{singleLead?.contactId?.categoryId?.name}</option>
                             {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
@@ -132,7 +144,7 @@ export default function MoreInfo({ singleLead, mutated }: any) {
                         <i onClick={() => { changeCategory(singleLead?.contactId?._id) }} className="fa fa-check p-1 rounded-1 cursorPointer bg-success text-white"> </i>
                         <i onClick={() => { setEditedCat(!editedCat) }} className="fa fa-times p-1 rounded-1 cursorPointer bg-danger text-white"> </i>
                     </>
-                        : <> <Link href={`/expert/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link><i onClick={() => setEditedCat(!editedCat)} className="fa fa-edit cursorPointer w-100 text-start"></i></>}
+                        : <> <Link href={`/expert/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link>{owner && <i onClick={() => setEditedCat(!editedCat)} className="fa fa-edit cursorPointer w-100 text-start"></i>}</>}
             </div>
             <div className="d-flex gap-1 align-items-center mb-2 fs90">
                 <span >وضعیت:</span>

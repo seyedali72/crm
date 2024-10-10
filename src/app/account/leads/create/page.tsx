@@ -72,7 +72,7 @@ export default function CreateLead() {
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">منبع ورودی </label>
                             <select className="form-control form-control-sm" onChange={(e: any) => setValue('source', e.target.value)}>
-                                <option value=''>منبع ورودی را انتخاب کنید</option>
+                                <option value='' hidden>منبع ورودی را انتخاب کنید</option>
                                 <option value='سایت'>سایت</option>
                                 <option value='نمایشگاه'>نمایشگاه</option>
                             </select>
@@ -81,7 +81,7 @@ export default function CreateLead() {
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">عنوان </label>
                             <select className="form-control form-control-sm" onChange={(e: any) => setValue('title', e.target.value)}>
-                                <option value=''>عنوان برای سرنخ  انتخاب کنید</option>
+                                <option value='' hidden>عنوان برای سرنخ  انتخاب کنید</option>
                                 <option value='مدیر گروه'>مدیر گروه </option>
                                 <option value='کارشناس'>کارشناس </option>
                                 <option value='سرپرست'>سرپرست </option>

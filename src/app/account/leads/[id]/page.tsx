@@ -1,10 +1,10 @@
 'use client'
 
-import { createCompany, getCompanies } from "@/app/action/company.action"
+import {  getCompanies } from "@/app/action/company.action"
 import { editContact } from "@/app/action/contact.action"
 import { createCustomer } from "@/app/action/customer.action"
 import { addCustomerToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import {  addCustomerToExpert,  addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
+import { addCustomerToExpert, addLeadToExpert, deleteLeadFromExpert, getExperts } from "@/app/action/expert.action"
 import { addCallStatus, addDialog, deleteLead, editDialog, editLead, getSingleLead } from "@/app/action/lead.action"
 import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
@@ -176,7 +176,7 @@ export default function EditLead() {
                             <button onClick={() => setPopup(false)} className="btn btn-sm" type="button"><i className="fa fa-times"></i></button>
                         </div>
                         <select className="form-control form-control-sm my-2 w-100" onChange={(e: any) => setExpertId(e?.target?.value)}  >
-                            <option value=''>کارشناس مورد نظر را انتخاب کنید</option>
+                            <option value='' hidden>کارشناس مورد نظر را انتخاب کنید</option>
                             {expertsList?.map((expert: any, idx: number) => <option key={nanoid()} value={expert?._id} >{expert?.employe_id?.name}</option>)}
                         </select>
                         {/* شرطی سازی دکمه ها  */}
@@ -214,7 +214,7 @@ export default function EditLead() {
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">منبع ورودی </label>
                                         {!editInfo ? <p>{singleLead?.contactId?.source !== '' ? singleLead?.contactId?.source : '---'}  </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('source', e.target.value)}>
-                                            <option value=''>منبع ورودی را انتخاب کنید</option>
+                                            {singleLead?.contactId?.source !== '' ? <option hidden value={singleLead?.contactId?.source}>{singleLead?.contactId?.source}</option> : <option value='' hidden>منبع ورودی را انتخاب کنید</option>}
                                             <option value='سایت'>سایت</option>
                                             <option value='نمایشگاه'>نمایشگاه</option>
                                         </select>}
@@ -222,7 +222,7 @@ export default function EditLead() {
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">عنوان </label>
                                         {!editInfo ? <p>{singleLead?.contactId?.title !== '' ? singleLead?.contactId?.title : '---'} </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('title', e.target.value)}>
-                                            <option value=''>عنوان برای سرنخ  انتخاب کنید</option>
+                                            {singleLead?.contactId?.title !== '' ? <option hidden value={singleLead?.contactId?.title}>{singleLead?.contactId?.title}</option> : <option value='' hidden>عنوان برای سرنخ  انتخاب کنید</option>}
                                             <option value='مدیر گروه'>مدیر گروه </option>
                                             <option value='کارشناس'>کارشناس </option>
                                             <option value='سرپرست'>سرپرست </option>
@@ -295,12 +295,12 @@ export default function EditLead() {
                                 <span onClick={() => { setPopup(true), setChangeExpertPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>}
                             {singleLead?.assignedAt !== undefined && <p>زمان اختصاص به کارشناس <b> {convertToPersianDate(singleLead?.assignedAt, 'YMDHM')}</b></p>}
                             <p>زمان ساخت سرنخ <b>{convertToPersianDate(singleLead?.createdAt, "YMDHM")}</b></p>
-                         {lastActivityResult !== 0 &&    <p>آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>}
+                            {lastActivityResult !== 0 && <p>آخرین فعالیت روی سرنخ <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>}
 
                             <div className="d-flex gap-1 align-items-center mb-3">
                                 <span className="text-nowrap" >شرکت مربوطه سرنخ:</span>
                                 {singleLead?.contactId?.companyId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
-                                    <option value=''>یک شرکت را انتخاب کنید</option>
+                                    <option value='' hidden>یک شرکت را انتخاب کنید</option>
                                     {companyList?.map((company: any) => { return (<option key={nanoid()} value={company?._id}>{company?.name}</option>) })}
                                 </select>
                                     <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/companeis/${singleLead?.contactId?.companyId?._id}`}>{singleLead?.contactId?.companyId?.name}</Link>}
@@ -309,7 +309,7 @@ export default function EditLead() {
                             <div className="d-flex gap-1 align-items-center mb-3">
                                 <span className="text-nowrap" >زمینه فعالیتی سرنخ:</span>
                                 {singleLead?.contactId?.categoryId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
-                                    <option value=''>یک زمینه را انتخاب کنید</option>
+                                    <option value='' hidden>یک زمینه را انتخاب کنید</option>
                                     {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
                                 </select>
                                     <button onClick={() => { addToCategory(singleLead?.contactId?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <Link href={`/account/customers/categoreis/${singleLead?.contactId?.categoryId?._id}`}>{singleLead?.contactId?.categoryId?.name}</Link>}

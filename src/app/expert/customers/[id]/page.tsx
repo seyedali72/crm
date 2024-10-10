@@ -33,11 +33,15 @@ export default function EditLead() {
     const [singleCustomer, setSingleLead] = useState<any>([])
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
+    const [owner, setOwner] = useState(false)
     const { user } = useUser()
     const fetchLead = useCallback(async () => {
-        let lead = await getSingleCustomer(id)
-        setSingleLead(lead)
-    }, [])
+        if (user?._id !== undefined) {
+            let customer = await getSingleCustomer(id)
+            customer?.expert?._id == user?._id ? setOwner(true) : setOwner(false)
+            setSingleLead(customer)
+        }
+    }, [user])
 
     useEffect(() => {
         fetchLead()
@@ -92,7 +96,7 @@ export default function EditLead() {
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">منبع ورودی </label>
                                         {!editInfo ? <p>{singleCustomer?.contactId?.source !== '' ? singleCustomer?.contactId?.source : '---'}  </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue('source', e.target.value)}>
-                                            {singleCustomer?.contactId?.source !== '' ? <option value={singleCustomer?.contactId?.source}>{singleCustomer?.contactId?.source}</option> : <option value=''>منبع ورودی را انتخاب کنید</option>}
+                                            {singleCustomer?.contactId?.source !== '' ? <option value={singleCustomer?.contactId?.source}>{singleCustomer?.contactId?.source}</option> : <option value='' hidden>منبع ورودی را انتخاب کنید</option>}
                                             <option value='سایت'>سایت</option>
                                             <option value='نمایشگاه'>نمایشگاه</option>
                                         </select>}
@@ -100,7 +104,7 @@ export default function EditLead() {
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">عنوان </label>
                                         {!editInfo ? <p>{singleCustomer?.contactId?.title !== '' ? singleCustomer?.contactId?.title : '---'} </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue('title', e.target.value)}>
-                                            {singleCustomer?.contactId?.title !== '' ? <option value={singleCustomer?.contactId?.title}>{singleCustomer?.contactId?.title}</option> : <option value=''>عنوان برای مشتری انتخاب کنید</option>}
+                                            {singleCustomer?.contactId?.title !== '' ? <option value={singleCustomer?.contactId?.title}>{singleCustomer?.contactId?.title}</option> : <option value='' hidden>عنوان برای مشتری انتخاب کنید</option>}
                                             <option value='مدیر گروه'>مدیر گروه </option>
                                             <option value='کارشناس'>کارشناس </option>
                                             <option value='سرپرست'>سرپرست </option>
@@ -138,12 +142,12 @@ export default function EditLead() {
                                     <button type='button' onClick={() => setEditInfo(!editInfo)} className="btn btn-primary btn-sm">درخواست ویرایش</button>
                                 </div>}
                         </section>
-                        <DialogSectionCus singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
+                        <DialogSectionCus owner={owner} singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
                     </section>
                     <section className="col-md-4 pe-2">
-                        <MoreInfoCus singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
-                        <ReminderSectionCus singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
-                        <CallLogSectionCus singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
+                        <MoreInfoCus owner={owner} singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
+                        <ReminderSectionCus owner={owner} singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
+                        <CallLogSectionCus owner={owner} singleCustomer={singleCustomer} mutated={() => setMutated(!mutated)} />
                     </section>
                 </section>
             </>

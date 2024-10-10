@@ -126,10 +126,11 @@ export const deleteExpert = async (expertId: string) => {
 }
 
 export const signinExpert = async (body: any) => {
+    console.log('signinExpert')
     await connect()
     try {
         const found = await Expert.findOne({ isDeleted: false, user_name: body.user_name, password: body.password, }).populate({ path: 'employe_id', select: 'name mobile_number', model: Employe })
-        const forCoockie = { name: found.employe_id.name, mobile_number: found.employe_id.mobile_number, user_name: found.user_name, _id: found._id, role: 9, userType: 'expert', isDeleted: false }
+        const forCoockie = { name: found.employe_id.name, mobile_number: found.employe_id.mobile_number, user_name: found.user_name, _id: found._id, role: found.role, userType: 'expert', isDeleted: false }
         if (forCoockie) {
             cookies().set('user', JSON.stringify(forCoockie))
             return JSON.parse(JSON.stringify(forCoockie))

@@ -31,7 +31,7 @@ export const getSingleCustomerCat = async (id: string) => {
     await connect()
 
     try {
-        const singleCustomerCat = await CustomerCat.findById(id).populate([{ path: 'users', model: Customer, populate: [{ path: 'expert', model: Expert }] }, { path: 'parent', model: CustomerCat }])
+        const singleCustomerCat = await CustomerCat.findById(id).populate([{ path: 'users', model: Contact }, { path: 'parent', model: CustomerCat }])
         return JSON.parse(JSON.stringify(singleCustomerCat))
     } catch (error) {
         console.log(error)
@@ -104,6 +104,24 @@ export const editCustomerFromCustomerCat = async (id: string, body: any, type: s
         let remove = await CustomerCat.findByIdAndUpdate(last, { $pull: { users: body } }, { new: true })
         let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
         if (type == 'company') {
+            await Company.findByIdAndUpdate(body, { categoryId: result?._id })
+        } else {
+            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
+        }
+
+        return JSON.parse(JSON.stringify(result))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر کارمند' }
+    }
+}
+export const removeContactFromCustomerCat = async (id: string, body: any) => {
+    await connect()
+
+    try {
+        let result = await CustomerCat.findByIdAndUpdate(id, { $pull: { users: body } }, { new: true })
+        let find = await Contact.findById(body)
+        if (find == undefined) {
             await Company.findByIdAndUpdate(body, { categoryId: result?._id })
         } else {
             await Contact.findByIdAndUpdate(body, { categoryId: result?._id })

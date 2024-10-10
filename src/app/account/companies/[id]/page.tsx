@@ -133,7 +133,7 @@ export default function addDialogs() {
                                     <div className="col-12 col-md-6">
                                         <label className='my-1' htmlFor="">منبع ورودی </label>
                                         {!editInfo ? <p>{singleCompany?.source !== '' ? singleCompany?.source : '---'}  </p> : <select className="form-control form-control-sm" onChange={(e: any) => setValue3('source', e.target.value)}>
-                                            <option value=''>منبع ورودی را انتخاب کنید</option>
+                                            <option value='' hidden>منبع ورودی را انتخاب کنید</option>
                                             <option value='سایت'>سایت</option>
                                             <option value='نمایشگاه'>نمایشگاه</option>
                                         </select>}
@@ -202,7 +202,7 @@ export default function addDialogs() {
                                <div className="d-flex gap-1 align-items-center mb-2">
                                 <span className="text-nowrap" >زمینه فعالیتی سرنخ:</span>
                                 {singleCompany?.categoryId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
-                                    <option value=''>یک زمینه را انتخاب کنید</option>
+                                    <option value='' hidden>یک زمینه را انتخاب کنید</option>
                                     {catList?.map((cat: any) => { return (<option key={nanoid()} value={cat?._id}>{cat?.name}</option>) })}
                                 </select>
                                     <button onClick={() => { addToCategory(singleCompany?._id) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button></> : <b>{singleCompany?.categoryId?.name}</b>}

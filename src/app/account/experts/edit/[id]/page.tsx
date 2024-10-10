@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 interface FormValues1 {
     user_name: string
     status: string
-    roles: string
+    role: string
     password: string
     teams: string
     employe_id: string
@@ -33,7 +33,7 @@ export default function Home() {
     const { handleSubmit, register, reset, setValue } = useForm<FormValues1>({
         values: {
             user_name: singleExpert?.user_name,
-            roles: singleExpert?.roles,
+            role: singleExpert?.role,
             password: singleExpert?.password,
             status: singleExpert?.status,
             teams: singleExpert?.teams?._id,
@@ -74,47 +74,55 @@ export default function Home() {
                         <div className="col-12 col-md-6 mb-2">شماره ملی : {singleExpert?.employe_id?.national_code}</div>
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">گروه فعالیتی </label>
-                            <select className="form-control form-control-sm" defaultValue={singleExpert?.teams?._id} onChange={(e: any) => [setValue('teams', e.target.value), setChange(true)]}>
-                                {!change && <option value={singleExpert?.teams?._id !== undefined ? singleExpert?.teams?._id : ''}>{singleExpert?.teams?.name !== undefined ? singleExpert?.teams?.name : 'بدون گروه'}</option>}
-                                {teamsList?.map((team: any, idx: number) => {
-                                    if (!change) {
-                                        if (team?._id !== singleExpert?.teams?._id) {
-                                            return (<option key={idx} value={team?._id}>{team?.name}</option>)
-                                        }
-                                    } else { return (<option key={idx} value={team?._id}>{team?.name}</option>) }
-                                })}
-                            </select>
+                            {!change ? <p>{singleExpert?.teams?.name !== undefined ? singleExpert?.teams?.name : 'بدون گروه'}</p> :
+                                <select className="form-control form-control-sm" defaultValue={singleExpert?.teams?._id} onChange={(e: any) => [setValue('teams', e.target.value), setChange(true)]}>
+                                    <option hidden value={singleExpert?.teams?._id !== undefined ? singleExpert?.teams?._id : ''}>{singleExpert?.teams?.name !== undefined ? singleExpert?.teams?.name : 'بدون گروه'}</option>
+                                    {teamsList?.map((team: any, idx: number) => {
+                                        return (<option key={idx} value={team?._id}>{team?.name}</option>)
+                                    }
+                                    )}
+                                </select>}
                         </div>
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">رمز عبور </label>
-                            <input type="text" className="form-control form-control-sm" {...register('password', { required: 'رمز عبور را وارد کنید', })} />
+                            {!change ? <p>*********</p> :
+                                <input type="text" className="form-control form-control-sm" {...register('password', { required: 'رمز عبور را وارد کنید', })} />}
                         </div>
 
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">وضعیت همکاری </label>
-                            <select className="form-control form-control-sm" defaultValue={singleExpert?.status} onChange={(e: any) => [setValue('status', e.target.value)]}>
-                                <option value={singleExpert?.status}>{singleExpert?.status == 'همکاری' ? 'درحال همکاری' : 'قطع همکاری'}</option>
-                                {singleExpert?.status !== 'همکاری' && <option value='همکاری'>درحال همکاری </option>}
-                                {singleExpert?.status !== 'قطع همکاری' && <option value='قطع همکاری'>قطع همکاری </option>}
-                            </select>
+                            {!change ? <p>{singleExpert?.status}</p> :
+                                <select className="form-control form-control-sm" defaultValue={singleExpert?.status} onChange={(e: any) => [setValue('status', e.target.value)]}>
+                                    <option hidden value={singleExpert?.status}>{singleExpert?.status}</option>
+                                    <option value='درحال همکاری'>درحال همکاری </option>
+                                    <option value='قطع همکاری'>قطع همکاری </option>
+                                </select>}
                         </div>
 
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">سطح دسترسی </label>
-                            <select className="form-control form-control-sm" defaultValue={singleExpert?.roles} onChange={(e: any) => setValue('roles', e.target.value)}>
-                                <option value={singleExpert?.roles}>{singleExpert?.roles}</option>
-                                {singleExpert?.roles !== 'مدیر گروه' && <option value='مدیر گروه'>مدیر گروه </option>}
-                                {singleExpert?.roles !== 'کارشناس' && <option value='کارشناس'>کارشناس </option>}
-                                {singleExpert?.roles !== 'سرپرست' && <option value='سرپرست'>سرپرست </option>}
-                                {singleExpert?.roles !== 'کاربر' && <option value='کاربر'>کاربر </option>}
-                            </select>
+                            <p>{singleExpert?.role == 2 ? 'مدیر فروش' : 'کارمند فروش'}</p>
+                            {/* {!change ? <p>{singleExpert?.role == 2 ? 'مدیر فروش' : 'کارمند فروش'}</p> :
+                                <select className="form-control form-control-sm" defaultValue={singleExpert?.role} onChange={(e: any) => setValue('role', e.target.value)}>
+                                    <option value='' hidden>سطح دسترسی کارشناس را انتخاب کنید</option>
+                                    <option value={2}>مدیر فروش </option>
+                                    <option value={3}>مدیر منابع انسانی </option>
+                                    <option value={4}>کارمند فروش </option>
+                                    <option value={5}>کارمند منابع انسانی </option>
+                                    <option value={6}>مدیر تدارکات </option>
+                                    <option value={7}>مسئول خرید </option>
+                                    <option value={8}>کاربر </option>
+                                </select>} */}
                         </div>
 
-                        <div className="col-12 my-2">
+                        {change && <div className="col-12 my-2">
                             <button type='submit' className="btn btn-primary btn-sm">ثبت ویرایش</button>
-                        </div>
+                        </div>}
                     </section>
                 </form>
+                {!change && <div className="col-12 my-2">
+                    <button type='button' onClick={() => setChange(!change)} className="btn btn-primary btn-sm">درخواست ویرایش</button>
+                </div>}
             </section>
         </>
     );

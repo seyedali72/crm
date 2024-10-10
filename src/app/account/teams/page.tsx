@@ -50,7 +50,7 @@ export default function Teams() {
                         </div>
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">تیم والد </label>
-                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('parent', e.target.value)}><option value=''>یک تیم را انتخاب کنید</option>
+                            <select className="form-control form-control-sm" onChange={(e: any) => setValue('parent', e.target.value)}><option value='' hidden>یک تیم را انتخاب کنید</option>
                                 {teams?.map((team: any, idx: number) => { return (<option key={idx} value={team?._id}>{team?.name}</option>) })}
                             </select>
                         </div>
