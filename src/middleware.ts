@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function redirect_to(role: number) {
-	return role === 0
+	return role === 9
 		? '/pishkhan'
 		: role === 1
 			? '/account/dashboard'
@@ -13,9 +13,11 @@ export function redirect_to(role: number) {
 						? '/expert/dashboard'
 						: role === 5
 							? '/expert/dashboard'
-							: role === 0
-								? '/auth/signin'
-								: '/account';
+							: role === 6
+								? '/employee/dashboard'
+								: role === 0
+									? '/auth/signin'
+									: '/account';
 }
 
 export function sendTo(request: any, role: number) {
@@ -43,6 +45,9 @@ export function middleware(request: NextRequest) {
 		return sendTo(request, role);
 	} else if (request.nextUrl.pathname.includes('expert/')) {
 		if (role === 5) return NextResponse.next();
+		return sendTo(request, role);
+	} else if (request.nextUrl.pathname.includes('employee/')) {
+		if (role === 6) return NextResponse.next();
 		return sendTo(request, role);
 	} else if (request.nextUrl.pathname.includes('hrm/')) {
 		if (role === 3) return NextResponse.next();

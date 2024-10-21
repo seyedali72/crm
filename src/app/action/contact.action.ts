@@ -43,8 +43,8 @@ export const createContact = async (body: any) => {
     let find = await Contact.findById(body?._id)
     if (find !== undefined) {
         try {
-            await Contact.create(body)
-            return { success: true }
+            let res = await Contact.create(body)
+            return JSON.parse(JSON.stringify(res))
         } catch (error) {
             console.log(error)
             return { error: 'خطا در ساخت شرکت' }
@@ -86,18 +86,25 @@ export const deleteContact = async (contactId: string) => {
 
 export const getCheckStatus = async (id: string) => {
     await connect()
-
     try {
         const lead = await Lead.findOne({ contactId: id })
         if (!lead?.isDeleted) {
             return JSON.parse(JSON.stringify({ 'lead': lead?._id }))
-        } else {
-            const customer = await Customer.findOne({ contactId: id })
-            return JSON.parse(JSON.stringify({ 'customer': customer?._id }))
-
         }
     } catch (error) {
         console.log(error)
         return { error: 'خطا در دریافت کارمند' }
+    }
+}
+
+export const editLeadFromSource = async (id: any, body: any, editor: string) => {
+    await connect()
+    let time = Date.now()
+    try {
+        let updatedLead = await Lead.findOneAndUpdate(id, { ...body, $push: { edits: { time, editor } } }, { new: true })
+        return JSON.parse(JSON.stringify(updatedLead))
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در تغییر سرنخ' }
     }
 }

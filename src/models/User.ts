@@ -6,28 +6,10 @@ import { IUser } from '@/app/utils/types'
 const baseUserSchema = new Schema<IUser, Model<IUser, any, any>, any>(
 	{
 		name: { type: String, default: 'کاربر ' },
-		user_name: {
-			type: String,
-			text: true,
-			trim: true,
-			index: { unique: true, sparse: true },
-			required: [true, 'نام الزامی است'],
-			maxLength: [150, 'نام کاربر باید حداکثر 150 کاراکتر باشد'],
-		},
-		password: {
-			trim: true,	
-			type: String,
-			required: [true, 'شماره همراه الزامی است'],
-		},
-		email: {
-			type: String,
-			trim: true,
-			maxLength: [100, 'ایمیل کاربر باید حداکثر 100 کاراکتر باشد'],
-		},
-		role: {
-			type: Number,
-			default: 1,
-		},
+		user_name: { type: String, text: true, trim: true, index: { unique: true, sparse: true }, required: [true, 'نام الزامی است'], maxLength: [150, 'نام کاربر باید حداکثر 150 کاراکتر باشد'], },
+		password: { trim: true, type: String, required: [true, 'شماره همراه الزامی است'], },
+		email: { type: String, trim: true, maxLength: [100, 'ایمیل کاربر باید حداکثر 100 کاراکتر باشد'], },
+		role: { type: Number, default: 1, },
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},

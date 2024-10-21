@@ -1,9 +1,10 @@
- 'use server'
+'use server'
 
 import Employe from '@/models/Employe'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
 import Department from '@/models/Department'
+import { cookies } from 'next/headers'
 
 /* ----- LEAD ----- */
 export const getEmployes = async (search?: any) => {
@@ -79,5 +80,21 @@ export const editEmploye = async (id: string, body: any) => {
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }
+    }
+}
+
+export const signinEmployee = async (body: any) => {
+
+    await connect()
+    try {
+        const found = await Employe.findOne({ isDeleted: false, national_code: body.user_name, mobile_number: body.password, })
+        const forCoockie = { name: found.name, mobile_number: found.mobile_number, user_name: found.national_code, _id: found._id, role: found.role, userType: 'employee', isDeleted: false }
+        if (forCoockie) { 
+            cookies().set('user', JSON.stringify(forCoockie))
+            return JSON.parse(JSON.stringify(forCoockie))
+        }
+    } catch (error) {
+        console.log(error)
+        return { error: 'خطا در ورود کارمند' }
     }
 }

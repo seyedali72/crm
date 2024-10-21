@@ -32,7 +32,7 @@ export default function CreateUser() {
             reset()
             router.replace('/account/users')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

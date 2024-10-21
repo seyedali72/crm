@@ -18,6 +18,7 @@ interface IReminder {
 	schedule?: Date
 	expertId: Types.ObjectId
 	leadId?: Types.ObjectId
+	opportunityId?: Types.ObjectId
 	customerId?: Types.ObjectId
 	isDeleted?: boolean
 	deletedAt?: Date
@@ -104,6 +105,24 @@ interface IContact {
 	isDeleted?: boolean
 	deletedAt?: Date
 }
+interface IOpportunity {
+	leadId: Types.ObjectId
+	expert: Types.ObjectId
+	assignedAt: Date
+	probability: number
+	amount: number
+	stage: string
+	title: string
+	description: string
+	dialog: string[]
+	call: string[]
+	edits: string[]
+	convert: object
+	failed: boolean
+	completed: boolean
+	isDeleted: boolean
+	deletedAt?: Date
+}
 interface ICustomer {
 	contactId?: Types.ObjectId
 	expert?: Types.ObjectId
@@ -120,35 +139,53 @@ interface ICompany {
 	name: string
 	phone_number_1: string
 	phone_number_2: string
-	website?: string
-	address?: string
-	categoryId?: Types.ObjectId
+	website: string
+	address: string
+	categoryId: Types.ObjectId
 	creator: Types.ObjectId
-	users?: [Types.ObjectId]
-	email?: string
-	status?: string
-	source?: string
-	description?: string
-	isDeleted?: boolean
+	users: [Types.ObjectId]
+	email: string
+	status: string
+	source: string
+	description: string
+	converted: boolean
+	isDeleted: boolean
 	deletedAt?: Date
 }
 
 interface ILead {
-	contactId?: Types.ObjectId
-	expert?: Types.ObjectId
+	name: string
+	phone_number_1: string
+	phone_number_2: string
+	source: string
+	title: string
+	description: string
+	address: string
+	email: string
+	status: string
+	contactId: Types.ObjectId
+	categoryId: Types.ObjectId
+	companyId: Types.ObjectId
+	creator: Types.ObjectId
+	birthdayDate: Date
+	opportunity: Types.ObjectId[]
+	expert: Types.ObjectId
 	assignedAt?: Date
-	dialog?: string[]
-	call?: string[]
-	edits?: string[]
-	isDeleted?: boolean
-	deletedAt?: Date
+	dialog: string[]
+	call: string[]
+	edits: string[]
+	converted: boolean
+	isCompany: boolean
+	isDeleted: boolean
+	deletedAt: Date
 }
 
 interface IEmploye {
 	name: string
-	national_code: number
-	mobile_number: number
-	phone_number: number
+	national_code: string
+	mobile_number: string
+	phone_number: string
+	role: number
 	department_id: Types.ObjectId
 	gender: string
 	email: string
@@ -247,7 +284,7 @@ export type {
 	ICategory, ICustomerCat,
 	IMeta, ITeams,
 	IClient, IUser,
-	ILead, ICustomer,
+	ILead, ICustomer,IOpportunity,
 	IFile, IExpert,
 	IOTP, IEmploye,
 	IPage, IDepartment,

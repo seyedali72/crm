@@ -6,15 +6,15 @@ import { buildQuery } from '../utils/helpers'
 import Lead from '@/models/Lead'
 import Employe from '@/models/Employe'
 import CustomerCat from '@/models/CustomerCategory'
-import Contact from '@/models/Contact'
 import Company from '@/models/Company'
+import Contact from '@/models/Contact'
 
 /* ----- LEAD ----- */
 export const getLeads = async (search?: any) => {
     await connect()
 
     try {
-        const allLeads = await Lead.find(buildQuery(search)).populate([{ path: 'expert', populate: { path: 'employe_id', model: Employe } }, { path: 'contactId', model: Contact }])
+        const allLeads = await Lead.find(buildQuery(search)).populate([{ path: 'expert', populate: { path: 'employe_id', model: Employe } }])
             .skip(search?.skip ? search?.skip : 0)
             .limit(search?.limit ? search?.limit : 0)
             .sort({ createdAt: -1 })
@@ -31,28 +31,28 @@ export const getSingleLead = async (id: string) => {
     await connect()
 
     try {
-        const singleLead = await Lead.findById(id).populate([{ path: 'contactId', model: Contact, populate: ([{ path: 'categoryId', select: 'name', model: CustomerCat }, { path: 'companyId', select: 'name', model: Company }]) }, { path: 'expert', select: 'employe_id', model: Expert, populate: ({ path: 'employe_id', select: 'name', model: Employe }) }])
+        const singleLead = await Lead.findById(id).populate([{ path: 'categoryId', select: 'name', model: CustomerCat }, { path: 'companyId', select: 'name', model: Company }, { path: 'contactId', select: 'name', model: Contact }, { path: 'expert', select: 'employe_id', model: Expert, populate: ({ path: 'employe_id', select: 'name', model: Employe }) }])
         return JSON.parse(JSON.stringify(singleLead))
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در دریافت کارمند' }
+        return { error: 'خطا در دریافت سرنخ' }
     }
 }
 
 export const createLead = async (body: any) => {
     await connect()
-    let id = body?.contactId
-    let data = await Lead.findOne({ contactId: id })
+
+    let data = await Lead.findOne({ phone_number_1: body?.phone_number_1 })
     if (data?._id == null) {
         try {
             let res = await Lead.create(body)
             return JSON.parse(JSON.stringify(res))
         } catch (error) {
             console.log(error)
-            return { error: 'خطا در تبدیل مخاطب' }
+            return { error: 'خطا در ساخت سرنخ' }
         }
     } else {
-        return { error: 'این مخاطب قبلا تبدیل شده است' }
+        return { error: 'این سرنخ قبلا ایجاد شده است' }
     }
 }
 
@@ -64,9 +64,10 @@ export const editLead = async (id: string, body: any, editor: string) => {
         return JSON.parse(JSON.stringify(updatedLead))
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
+        return { error: 'خطا در تغییر سرنخ' }
     }
 }
+
 
 export const editDialog = async (id: string, body: any, expertId: string) => {
     await connect()
@@ -84,7 +85,7 @@ export const editDialog = async (id: string, body: any, expertId: string) => {
         return JSON.parse(JSON.stringify(lead))
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
+        return { error: 'خطا در تغییر سرنخ' }
     }
 }
 export const addDialog = async (id: string, body: any, expertId: string) => {
@@ -96,7 +97,7 @@ export const addDialog = async (id: string, body: any, expertId: string) => {
         return JSON.parse(JSON.stringify(updatedLead))
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
+        return { error: 'خطا در تغییر سرنخ' }
     }
 }
 
@@ -109,7 +110,7 @@ export const addCallStatus = async (id: string, body: any, expertId: string) => 
         return JSON.parse(JSON.stringify(updatedLead))
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در تغییر کارمند' }
+        return { error: 'خطا در تغییر سرنخ' }
     }
 }
 
@@ -127,6 +128,6 @@ export const deleteLead = async (leadId: string) => {
         return { success: true }
     } catch (error) {
         console.log(error)
-        return { error: 'خطا در پاک کردن کارمند' }
+        return { error: 'خطا در پاک کردن سرنخ' }
     }
 }

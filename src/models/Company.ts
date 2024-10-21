@@ -5,13 +5,7 @@ import { Schema, model, Model, models } from 'mongoose'
 
 const baseCompanySchema = new Schema<ICompany, Model<ICompany, any, any>, any>(
 	{
-		name: {
-			type: String,
-			text: true,
-			trim: true,
-			required: [true, 'نام الزامی است'],
-			maxLength: [150, 'نام شرکت باید حداکثر 150 کاراکتر باشد'],
-		},
+		name: { type: String, text: true, trim: true, required: [true, 'نام الزامی است'], maxLength: [150, 'نام شرکت باید حداکثر 150 کاراکتر باشد'], },
 		phone_number_1: { type: String, trim: true, index: { unique: true, sparse: true }, required: [true, 'شماره همراه الزامی است'], },
 		phone_number_2: { type: String, trim: true },
 		status: { type: String, trim: true, default: 'جدید' },
@@ -22,6 +16,7 @@ const baseCompanySchema = new Schema<ICompany, Model<ICompany, any, any>, any>(
 		categoryId: { type: Schema.Types.ObjectId, ref: 'CustomerCategory' },
 		creator: { type: Schema.Types.ObjectId, ref: 'Expert' },
 		address: { type: String },
+		converted: { type: Boolean, required: true, default: false },
 		email: { type: String, trim: true, },
 		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },

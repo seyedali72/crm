@@ -1,14 +1,14 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { deleteCompany, getCompanies } from '../../action/company.action'
+import { getCheckCompany, getCompanies } from '@/app/action/company.action'
 import { toast } from 'react-toastify'
-import { Confirmation } from '../../components/Confirmation'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [companyList, setCompanyList] = useState([])
   const [filter, setFilter] = useState('')
-  const [mutated, setMutated] = useState(false)
+  const router = useRouter()
   const fetchLeatList = useCallback(async () => {
     let companies = await getCompanies({ isDeleted: false })
     setCompanyList(companies)
@@ -16,10 +16,13 @@ export default function Home() {
 
   useEffect(() => {
     fetchLeatList()
-  }, [fetchLeatList, mutated])
-  const handleDelete = async (companyId: any) => {
-    let res = await deleteCompany(companyId)
-    if (!res.error) { setMutated(!mutated) }
+  }, [fetchLeatList])
+  const checkStatus = async (id: any) => {
+    toast.success('در حال پردازش')
+    let res = await getCheckCompany(id)
+    if (res?.lead !== undefined) {
+      router.replace(`/account/leads/${res?.lead}`)
+    }
   }
   return (
     <>
@@ -34,9 +37,6 @@ export default function Home() {
           <div className="col-md-6">
             <input type="text" onChange={(e: any) => setFilter(e.target.value)} placeholder='فیلتر براساس نام یا شماره موبایل ' className="form-control form-control-sm" />
           </div>
-          <Link href="/account/companies/create" className="btn bg-success text-white btn-sm" >
-            افزودن شرکت جدید
-          </Link>
         </section>
         <section className="table-responsive">
           <table className="table table-hover table-striped">
@@ -44,24 +44,25 @@ export default function Home() {
               <tr>
                 <th className="text-center">#</th>
                 <th>نام و فامیلی</th>
-                <th>وضعیت</th> 
+                <th>وضعیت</th>
                 <th>کارشناس</th>
                 <th className=" text-center"> <i className="fa fa-cogs px-1"></i>تنظیمات </th>
               </tr>
             </thead>
             <tbody>
               {companyList.map((company: any, idx: number) => {
-                if (company.name.includes(filter) || company.phone_number_1.includes(filter)) {
+                if (company?.name?.includes(filter) || company?.phone_number_1?.includes(filter)) {
                   return (<tr key={idx}>
                     <td className='text-center'>{idx + 1}</td>
-                    <td >{company.name} </td>
+                    <td>{company.name}</td>
                     <td>{company.status}</td>
                     <td>{company.phone_number_1}</td>
-                     <td className="  text-center">
-                      <Link href={`/account/companies/${company?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>
-                      <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(company?._id)} />, { autoClose: false, })}>
+                    <td className="  text-center">
+                      {company?.converted ? <button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => checkStatus(company?._id)}> <i className="fa fa-refresh px-1"></i>جزئیات </button>
+                        : 'تبدیل نشده است'}
+                      {/* <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(company?._id)} />, { autoClose: false, })}>
                         <i className="fa fa-trash px-1"></i>حذف
-                      </button>
+                      </button> */}
                     </td>
                   </tr>)
                 }

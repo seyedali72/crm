@@ -1,17 +1,16 @@
 'use client'
 
-import { addContactToCompany, editContactCompany, getCompanies } from "@/app/action/company.action"
+import { addLeadToCompany, editLeadCompany, getCompanies } from "@/app/action/company.action"
 import { editContact } from "@/app/action/contact.action"
-import { createCustomer, editCustomer } from "@/app/action/customer.action"
-import { addCustomerToCustomerCat, editCustomerFromCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import { addCustomerToExpert, deleteLeadFromExpert, getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
-import { deleteLead, editLead } from "@/app/action/lead.action"
+import {  editCustomer } from "@/app/action/customer.action"
+import { addLeatToCustomerCat, editLeadFromCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
+import { addCustomerToExpert,  getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
+import {  editLead } from "@/app/action/lead.action"
 import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import { nanoid } from "nanoid"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+ import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 export default function MoreInfoCus({ singleCustomer, mutated, owner }: any) {
@@ -43,7 +42,7 @@ export default function MoreInfoCus({ singleCustomer, mutated, owner }: any) {
             toast.success('انجام شده')
             mutated()
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 
@@ -54,14 +53,14 @@ export default function MoreInfoCus({ singleCustomer, mutated, owner }: any) {
     const lastActivityResult = lastActivityArr.reduce((c: any, d: any) => Math.max(c, d));
 
     const addToCategory = async (contactId: any) => {
-        let res = await addCustomerToCustomerCat(catId, contactId, 'customer')
+        let res = await addLeatToCustomerCat(catId, contactId, 'customer')
         if (!res?.error) {
             await editLead(singleCustomer?._id, {}, user?._id)
             mutated()
         }
     }
     const changeCategory = async (contactId: any) => {
-        let res = await editCustomerFromCustomerCat(catId, contactId, 'customer', singleCustomer?.contactId?.categoryId?._id)
+        let res = await editLeadFromCustomerCat(catId, contactId, 'customer', singleCustomer?.contactId?.categoryId?._id)
         if (!res?.error) {
             mutated()
             setEditedCat(false)
@@ -69,13 +68,13 @@ export default function MoreInfoCus({ singleCustomer, mutated, owner }: any) {
     }
 
     const addToCompany = async (contactId: any) => {
-        let res = await addContactToCompany(companyId, contactId)
+        let res = await addLeadToCompany(companyId, contactId)
         if (!res?.error) {
             mutated()
         }
     }
     const changeCompany = async (contactId: any) => {
-        let res = await editContactCompany(companyId, contactId, singleCustomer?.contactId?.companyId?._id)
+        let res = await editLeadCompany(companyId, contactId, singleCustomer?.contactId?.companyId?._id)
         if (!res?.error) {
             mutated()
             setEdited(false)
@@ -91,7 +90,7 @@ export default function MoreInfoCus({ singleCustomer, mutated, owner }: any) {
     return (
 
         <section className="main-body-container rounded fs90">
-            {popup ? <div className="popupCustome">
+            {popup ? <div className="popupCustom">
                 <section className="main-body-container rounded">
                     <div className="d-flex justify-content-between"> <h5>کارشناس مورد نظر را انتخاب کنید</h5>
                         <button onClick={() => setPopup(false)} className="btn btn-sm" type="button"><i className="fa fa-times"></i></button>

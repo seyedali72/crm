@@ -1,10 +1,12 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { deleteCompany, getCompanies } from '../../action/company.action'
+import { deleteCompany, editCompany, getCheckCompany, getCompanies } from '../../action/company.action'
 import { toast } from 'react-toastify'
 import { Confirmation } from '../../components/Confirmation'
 import { useUser } from '@/app/context/UserProvider'
+import { createLead } from '@/app/action/lead.action'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [companyList, setCompanyList] = useState([])
@@ -17,7 +19,22 @@ export default function Home() {
       setCompanyList(companies)
     }
   }, [user])
-
+  const router = useRouter()
+  const convertToLead = async (obj: any) => {
+    let body = { ...obj, companyId: obj._id, expert: user?._id, assignedAt: Date.now(), status: 'سرنخ جدید', converted: true }
+    let res = await createLead(body)
+    if (!res?.error) {
+      await editCompany(obj, { converted: true })
+      router.replace(`/crm/leads/${res?._id}`)
+    } else { toast.error(res?.error) }
+  }
+  const checkStatus = async (id: any) => {
+    toast.success('در حال پردازش')
+    let res = await getCheckCompany(id)
+    if (res?.lead !== undefined) {
+      router.replace(`/crm/leads/${res?.lead}`)
+    }
+  }
   useEffect(() => {
     fetchCompanyList()
   }, [fetchCompanyList, mutated])
@@ -61,14 +78,15 @@ export default function Home() {
                     <td >{company.name} </td>
                     <td>{company.status}</td>
                     <td>{company.phone_number_1}</td>
-                    {company?.creator == user?._id ?
-                      <td className="  text-center">
-                        <Link href={`/crm/companies/${company?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>
-                        <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(company?._id)} />, { autoClose: false, })}>
-                          <i className="fa fa-trash px-1"></i>حذف
-                        </button>
-                      </td>
-                      : <td> <Link href={`/crm/companies/${company?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-eye px-1"></i>نمایش</Link></td>}
+                    {company?.converted ?
+                      <td><button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => checkStatus(company?._id)}> <i className="fa fa-refresh px-1"></i>جزئیات </button>
+                        {company?.creator == user?._id && <Link href={`/crm/companies/${company?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i> ویرایش</Link>}</td>
+                      :    company?.creator == user?._id ? <td className="text-center">
+                        <button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => convertToLead(company)}> <i className="fa fa-refresh px-1"></i>تبدیل به سرنخ </button>
+                        <Link href={`/crm/companies/${company?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i> ویرایش</Link>
+                        <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(company?._id)} />, { autoClose: false, })}> <i className="fa fa-trash px-1"></i>حذف </button>
+                      </td>: <td>شما دسترسی ندارید</td>
+                    }
                   </tr>)
                 }
               })}

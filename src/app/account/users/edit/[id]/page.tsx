@@ -38,7 +38,7 @@ export default function EditUser() {
             reset()
             router.replace('/account/users')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

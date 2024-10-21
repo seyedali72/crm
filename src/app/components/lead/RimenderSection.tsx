@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form"
 import DatePicker from "react-multi-date-picker"
 import TimePicker from "react-multi-date-picker/plugins/time_picker"
 import { toast } from "react-toastify"
+import { Confirmation } from "../Confirmation"
 interface FormValues {
     description: string
     schedule: Date
@@ -29,7 +30,7 @@ export default function ReminderSection({ singleLead, mutated, owner }: any) {
     const { handleSubmit, register, reset, control } = useForm<FormValues>()
     const { handleSubmit: handleSubmit1, register: register1, reset: reset1, control: control1 } = useForm<FormValues1>()
     const fetchData = useCallback(async () => {
-        let data = await getReminders({  isDeleted: false, leadId: singleLead?._id })
+        let data = await getReminders({ isDeleted: false, leadId: singleLead?._id })
         setReminders(data)
     }, [])
     const handleCreateReminder = async (obj: any) => {
@@ -47,13 +48,19 @@ export default function ReminderSection({ singleLead, mutated, owner }: any) {
         if (!res.error) { setReminderPopup(false); mutated(); reset(), setReminderPopup(false), setEdited(false) }
     }
     const complateReminder = async () => {
+        await editReminder(reminderId?._id, { status: 'انجام شد' })
         let res = await deleteReminder(reminderId?._id)
         if (!res.error) { toast.success('یادآور با موفقیت تکمیل شد'), mutated(), setReminderPopup(false), setEdited(false), reset() }
+    }
+    const cancelReminder = async () => {
+        await editReminder(reminderId?._id, { status: 'کنسل شد' })
+        let res = await deleteReminder(reminderId?._id)
+        if (!res.error) { toast.success('یادآور با متاسفانه کنسل شد'), mutated(), setReminderPopup(false), reset() }
     }
     useEffect(() => { fetchData() }, [fetchData, mutated])
     return (
         <>
-            {reminderPopup && <div className="popupCustome">
+            {reminderPopup && <div className="popupCustom">
                 {edited ?
                     <section className="main-body-container rounded">
                         <div className="d-flex justify-content-between"> <h5>ویرایش یادآور </h5>
@@ -79,9 +86,13 @@ export default function ReminderSection({ singleLead, mutated, owner }: any) {
                                 <label className="my-1" >توضیحات اضافی</label>
                                 <textarea className="form-control" placeholder="توضیحات اضافی" defaultValue={reminderId?.description} {...register('description')} ></textarea>
                             </div>
-                            {owner && <div className="col-12"><button type="submit" className="btn w-100 btn-sm bg-custom-2 text-white px-3" >ثبت ویرایش</button></div>}
+                            {owner && <div className="col-12"><button type="submit" className="btn w-100 btn-sm bg-custom-4 text-white px-3" >ثبت ویرایش</button></div>}
                         </form>
-                        {owner && <div className="col-12"><button type="button" onClick={() => complateReminder()} className="btn mt-2 w-100 btn-sm bg-custom-4 text-white px-3" >تکمیل یادآور</button></div>}
+
+                        {owner && <div className="col-12 d-flex gap-2"><button type="button" onClick={() => toast(<Confirmation type='تکمیل' onDelete={() => complateReminder()} />, { autoClose: false, })} className="btn mt-2 w-100 btn-sm bg-custom-2 text-white px-3" >تکمیل یادآور</button>
+                            <button type="button" onClick={() => toast(<Confirmation type='کنسل' onDelete={() => cancelReminder()} />, { autoClose: false, })} className="btn mt-2 w-100 btn-sm bg-custom-3 text-white px-3" >کنسل کردن یادآور</button>
+                        </div>
+                        }
                     </section>
                     : <section className="main-body-container rounded">
                         <div className="d-flex justify-content-between"> <h5>زمان یادآوری را مشخص کنید</h5>

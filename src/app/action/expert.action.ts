@@ -126,7 +126,7 @@ export const deleteExpert = async (expertId: string) => {
 }
 
 export const signinExpert = async (body: any) => {
-    console.log('signinExpert')
+
     await connect()
     try {
         const found = await Expert.findOne({ isDeleted: false, user_name: body.user_name, password: body.password, }).populate({ path: 'employe_id', select: 'name mobile_number', model: Employe })

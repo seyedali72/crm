@@ -53,7 +53,7 @@ export default function ReminderSectionCus({ singleCustomer, mutated, owner }: a
     useEffect(() => { fetchData() }, [fetchData, mutated])
     return (
         <>
-            {reminderPopup && <div className="popupCustome">
+            {reminderPopup && <div className="popupCustom">
                 {edited ?
                     <section className="main-body-container rounded">
                         <div className="d-flex justify-content-between"> <h5>ویرایش یادآور </h5>

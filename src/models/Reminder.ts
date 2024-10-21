@@ -13,7 +13,7 @@ const baseReminderSchema = new Schema<IReminder, Model<IReminder, any, any>, any
 		status: { type: String, trim: true, default: 'جدید' },
 		expertId: { type: Schema.Types.ObjectId, ref: 'Expert' },
 		leadId: { type: Schema.Types.ObjectId, ref: 'Lead' },
-		customerId: { type: Schema.Types.ObjectId, ref: 'Customer' },
+		opportunityId: { type: Schema.Types.ObjectId, ref: 'Opportunity' },
  		isDeleted: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date },
 	},

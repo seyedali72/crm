@@ -46,7 +46,7 @@ export default function CreateContact() {
             reset()
             router.replace('/crm/contacts')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
     const fetchData = useCallback(async () => {

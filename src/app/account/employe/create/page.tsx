@@ -1,6 +1,6 @@
 'use client'
 import { Controller, useForm } from 'react-hook-form'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect,  useState } from 'react'
 import Link from 'next/link'
 import { createEmploye } from '@/app/action/employe.action'
 import { useRouter } from 'next/navigation'
@@ -49,7 +49,7 @@ export default function Home() {
       reset()
       router.replace('/account/employe')
     } else {
-      toast.error('ridi')
+      toast.error('ناموفق بود')
     }
   }
   useEffect(() => {

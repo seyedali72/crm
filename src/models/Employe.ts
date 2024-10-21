@@ -6,10 +6,11 @@ import { Schema, model, Model, models } from 'mongoose'
 const baseEmployeSchema = new Schema<IEmploye, Model<IEmploye, any, any>, any>(
 	{
 		name: { type: String, text: true, trim: true, required: [true, 'نام الزامی است'], maxLength: [150, 'نام کارمند باید حداکثر 150 کاراکتر باشد'], },
-		national_code: { type: Number, index: { unique: true, sparse: true }, required: [true, 'شماره ملی الزامی است'], },
-		mobile_number: { type: Number, index: { unique: true, sparse: true }, required: [true, 'شماره همراه الزامی است'], },
+		national_code: { type: String, index: { unique: true, sparse: true }, required: [true, 'شماره ملی الزامی است'], },
+		mobile_number: { type: String, index: { unique: true, sparse: true }, required: [true, 'شماره همراه الزامی است'], },
 		status: { type: String, trim: true, default: 'غیرفعال' },
-		phone_number: { type: Number, },
+		role: { type: Number, default: 6 },
+		phone_number: { type: String, },
 		department_id: { type: Schema.Types.ObjectId, ref: 'Department' },
 		skill: { type: String, trim: true },
 		emergencyContacts: [{ type: Object }],

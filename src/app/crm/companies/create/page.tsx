@@ -31,7 +31,7 @@ export default function CreateCompany() {
             reset()
             router.replace('/crm/companies')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

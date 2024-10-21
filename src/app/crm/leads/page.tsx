@@ -13,7 +13,7 @@ export default function Home() {
   const [mutated, setMutated] = useState(false)
   const fetchLeadList = useCallback(async () => {
     if (user?._id !== undefined) {
-      let leads = await getLeads({ isDeleted: false})
+      let leads = await getLeads({ isDeleted: false })
       setLeadList(leads)
     }
   }, [user])
@@ -53,24 +53,24 @@ export default function Home() {
                 <th>کارشناس</th>
                 <th>شماره تماس</th>
                 <th>تماس ها</th>
-                 <th className=" text-center"> <i className="fa fa-cogs px-1"></i>تنظیمات </th>
+                <th className=" text-center"> <i className="fa fa-cogs px-1"></i>تنظیمات </th>
               </tr>
             </thead>
             <tbody>
               {leadList.map((lead: any, idx: number) => {
-                if (lead.contactId.name.includes(filter) || lead.contactId.phone_number_1.includes(filter)) {
+                if (lead.name.includes(filter) || lead.phone_number_1.includes(filter)) {
                   return (<tr key={idx}>
                     <td className='text-center'>{idx + 1}</td>
-                    <td >{lead.contactId.name} </td>
-                    <td>{lead.contactId.status}</td>
+                    <td >{lead.name} </td>
+                    <td>{lead.status}</td>
                     <td>{lead?.expert?.employe_id?.name}</td>
-                    <td>{lead.contactId.phone_number_1}</td>
+                    <td>{lead.phone_number_1}</td>
                     <td>{lead.call.length && lead.call.length}</td>
-                     <td className="  text-center">
+                    <td className="  text-center">
                       <Link href={`/crm/leads/${lead?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>
-                      <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(lead?._id)} />, { autoClose: false, })}>
+                      {lead?.expert?._id == user?._id && <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(lead?._id)} />, { autoClose: false, })}>
                         <i className="fa fa-trash px-1"></i>حذف
-                      </button>
+                      </button>}
                     </td>
                   </tr>)
                 }

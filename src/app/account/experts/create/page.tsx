@@ -43,7 +43,7 @@ export default function Home() {
                 reset()
                 router.replace('/account/experts')
             } else {
-                toast.error('ridi')
+                toast.error('ناموفق بود')
             }
         } else { toast.error('nashod') }
     }

@@ -2,7 +2,7 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { editContact, getSingleContact } from '@/app/action/contact.action'
+import { editContact, editLeadFromSource, getSingleContact } from '@/app/action/contact.action'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { getCustomerCats } from '@/app/action/customerCat.action'
@@ -39,12 +39,13 @@ export default function EditContact() {
     const handleEditContact = async (obj: any) => {
         let res = await editContact(singleContact?._id, obj)
         if (!res.error) {
+            await editLeadFromSource({ contactId: res?._id }, obj, user?._id)
             toast.success('ایجاد شد')
             setMutated(!mutated)
             reset()
             router.replace('/crm/contacts')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

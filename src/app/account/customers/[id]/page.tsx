@@ -1,10 +1,10 @@
 'use client'
 
-import { createCompany, getCompanies } from "@/app/action/company.action"
+import { getCompanies } from "@/app/action/company.action"
 import { editContact } from "@/app/action/contact.action"
-import { addCallStatus, addDialog, createCustomer, editCustomer, editDialog, getSingleCustomer } from "@/app/action/customer.action"
-import { addCustomerToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import { addCustomerToExpert, addLeadToExpert, deleteLeadFromExpert, getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
+import { addCallStatus, addDialog, editCustomer, editDialog, getSingleCustomer } from "@/app/action/customer.action"
+import { addLeatToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
+import { addCustomerToExpert, getExperts, removeCustomerFromExpert } from "@/app/action/expert.action"
 import { useUser } from "@/app/context/UserProvider"
 import { convertToPersianDate } from "@/app/utils/helpers"
 import { nanoid } from "nanoid"
@@ -44,14 +44,10 @@ export default function EditLead() {
     const [companyList, setCompanyList] = useState<any>([])
     const [expertsList, setExpertList] = useState<any>([])
     const [singleCustomer, setSingleLead] = useState<any>([])
-    const [deletedCheck, setDeletedCheck] = useState(false)
     const [popup, setPopup] = useState(false)
-    const [changeExpertPopup, setChangeExpertPopup] = useState(false)
-    const [customerPopup, setCustomerPopup] = useState(false)
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
     const { user } = useUser()
-    const router = useRouter()
     const fetchLead = useCallback(async () => {
         let lead = await getSingleCustomer(id)
         setSingleLead(lead)
@@ -99,7 +95,7 @@ export default function EditLead() {
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
         setEditInfo(false)
     }
@@ -112,7 +108,7 @@ export default function EditLead() {
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
     let reverseArray = singleCustomer?.dialog?.slice()?.reverse()
@@ -128,7 +124,7 @@ export default function EditLead() {
     const lastActivityResult = lastActivityArr.reduce((c: any, d: any) => Math.max(c, d));
 
     const addToCategory = async (contactId: any) => {
-        let res = await addCustomerToCustomerCat(catId, contactId, 'customer')
+        let res = await addLeatToCustomerCat(catId, contactId, 'customer')
         if (!res?.error) {
             await editCustomer(singleCustomer?._id, {}, user?._id)
             setMutated(!mutated)
@@ -151,7 +147,7 @@ export default function EditLead() {
                         <li className="breadcrumb-item active" aria-current="page">{singleCustomer?.contactId?.name}</li>
                     </ol>
                 </nav>
-                {popup ? <div className="popupCustome">
+                {popup ? <div className="popupCustom">
                     <section className="main-body-container rounded">
                         <div className="d-flex justify-content-between"> <h5>کارشناس مورد نظر را انتخاب کنید</h5>
                             <button onClick={() => setPopup(false)} className="btn btn-sm" type="button"><i className="fa fa-times"></i></button>
@@ -266,7 +262,7 @@ export default function EditLead() {
                     <section className="col-md-4 pe-2">
                         <section className="main-body-container rounded">
                             {singleCustomer?.expert !== undefined && <p className="w-100 d-flex justify-content-between align-item-center"><span>نام کارشناس: <Link href={`/account/expert/${singleCustomer?.expert?._id}`}> {singleCustomer?.expert?.employe_id?.name}</Link></span>
-                                <span onClick={() => { setPopup(true), setChangeExpertPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>}
+                                <span onClick={() => { setPopup(true) }} className="text-danger cursorPointer">تغییر کارشناس</span></p>}
                             <p>زمان اختصاص به کارشناس <b> {convertToPersianDate(singleCustomer?.assignedAt, 'YMDHM')}</b></p>
                             <p>زمان ساخت مشتری <b>{convertToPersianDate(singleCustomer?.createdAt, "YMDHM")}</b></p>
                             <p>آخرین فعالیت روی مشتری <b>{convertToPersianDate(lastActivityResult, "YMDHM")}  </b></p>

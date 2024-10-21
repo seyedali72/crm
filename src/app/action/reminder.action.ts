@@ -1,19 +1,17 @@
 'use server'
 
-import { cookies } from 'next/headers'
-import connect from '../lib/db'
+ import connect from '../lib/db'
 import Reminder from '@/models/Reminder'
 import { buildQuery } from '../utils/helpers'
 import Lead from '@/models/Lead'
-import Customer from '@/models/Customer'
-import Contact from '@/models/Contact'
+import Opportunity from '@/models/Opportunity'
 
 /* ----- Reminder ----- */
 export const getReminders = async (search?: any) => {
 	await connect()
 
 	try {
-		const allReminders = await Reminder.find(buildQuery(search)).populate([{ path: 'leadId', select: 'contactId', model: Lead, populate: [{ path: 'contactId', select: 'name', model: Contact }] }, { path: 'customerId', select: 'contactId', model: Customer, populate: [{ path: 'contactId', select: 'name', model: Contact }] }])
+		const allReminders = await Reminder.find(buildQuery(search)).populate([{ path: 'leadId', model: Lead }, { path: 'opportunityId', select: 'title', model: Opportunity }])
 			.skip(search?.skip ? search?.skip : 0)
 			.limit(search?.limit ? search?.limit : 0)
 			.sort({ createdAt: -1 })

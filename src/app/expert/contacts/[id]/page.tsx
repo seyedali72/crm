@@ -2,7 +2,7 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { editContact, getSingleContact } from '@/app/action/contact.action'
+import { editContact, editLeadFromSource, getSingleContact } from '@/app/action/contact.action'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { getCustomerCats } from '@/app/action/customerCat.action'
@@ -11,6 +11,7 @@ import { getCompanies } from '@/app/action/company.action'
 import DatePicker from 'react-multi-date-picker'
 import persian from 'react-date-object/calendars/persian'
 import persian_fa from 'react-date-object/locales/persian_fa'
+import { useUser } from '@/app/context/UserProvider'
 
 interface FormValues1 {
     name: string
@@ -32,15 +33,17 @@ export default function EditContact() {
     const [catList, setCatList] = useState<any>([])
     const [singleContact, setSingleContact] = useState<any>()
     const router = useRouter()
+    const { user } = useUser()
     const handleEditContact = async (obj: any) => {
         let res = await editContact(singleContact?._id, obj)
         if (!res.error) {
+            await editLeadFromSource({ contactId: res?._id }, obj, user?._id)
             toast.success('ایجاد شد')
             setMutated(!mutated)
             reset()
             router.replace('/expert/contacts')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
     const { id }: any = useParams()

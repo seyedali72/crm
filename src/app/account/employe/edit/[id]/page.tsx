@@ -13,9 +13,9 @@ import { getDepartments } from '@/app/action/department.action'
 import EmergencyContact from '@/app/components/EmergencyContact'
 interface FormValues1 {
   name: string
-  national_code: number
-  mobile_number: number
-  phone_number: number
+  national_code: string
+  mobile_number: string
+  phone_number: string
   gender: string
   department_id: string
   skill: string
@@ -74,7 +74,7 @@ export default function Home() {
       reset()
       router.replace('/account/employe')
     } else {
-      toast.error('ridi')
+      toast.error('ناموفق بود')
     }
   }
   useEffect(() => {
@@ -104,8 +104,8 @@ export default function Home() {
             </div>
             <div className="col-12 col-md-4 mb-2">
               <label className='my-1' htmlFor="">دپارتمان</label>
-              <select className="form-control form-control-sm" defaultValue={singleEmploye?.department_id?._id} onChange={(e: any) => { setValue('department_id', e.target.value), setDepartment(e.target.value) }} >
-                {department !== '' ? <option value={singleEmploye?.department_id !== undefined ? singleEmploye?.department_id?._id : ''} hidden>{singleEmploye?.department_id !== undefined ? singleEmploye?.department_id?.name : 'بدون گروه'}</option> : <option value='' hidden>دپارتمان مورد نظر را انتخاب کنید</option>}
+              <select className="form-control form-control-sm" onChange={(e: any) => { setValue('department_id', e.target.value) }} >
+                <option value='' hidden>{singleEmploye?.department_id !== undefined ? singleEmploye?.department_id?.name : 'بدون گروه'}</option>
                 {departments?.map((department: any, idx: number) => <option key={idx} value={department?._id} >{department?.name}</option>)}
               </select>
             </div>
@@ -159,28 +159,7 @@ export default function Home() {
               <label className='my-1' htmlFor="">جنسیت </label>
               <input type="text" className="form-control form-control-sm" {...register('gender')} />
             </div>
-            {/* انتخاب دسترسی  */}
-            {/* <section className="row col-12 mt-3">
-                <div className="col-6 col-md-3 d-flex mt-1">
-                  <input type="checkbox" className="mx-2" id="check1" checked />
-                  <label htmlFor="check1">گزینه یک</label>
-                </div>
-
-                <div className="col-6 col-md-3 d-flex mt-1">
-                  <input type="checkbox" className="mx-2" id="check2" checked />
-                  <label htmlFor="check2">گزینه یک</label>
-                </div>
-
-                <div className="col-6 col-md-3 d-flex mt-1">
-                  <input type="checkbox" className="mx-2" id="check3" checked />
-                  <label htmlFor="check3">گزینه یک</label>
-                </div>
-
-                <div className="col-6 col-md-3 d-flex mt-1">
-                  <input type="checkbox" className="mx-2" id="check4" checked />
-                  <label htmlFor="check4">گزینه یک</label>
-                </div>
-              </section> */}
+         
           </section>
         </section>
         <EmergencyContact edit={true} data={singleEmploye?.emergencyContacts} contactInfo={(a: any) => { setEContactOne(a[0]); setEContactTwo(a[1]); }} />

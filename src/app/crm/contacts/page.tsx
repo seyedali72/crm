@@ -34,9 +34,7 @@ export default function Home() {
     if (res.lead) {
       router.replace(`/crm/leads/${res.lead}`)
     }
-    if (res.customer) {
-      router.replace(`/crm/customers/${res.customer}`)
-    }
+  
 
   }
   useEffect(() => {

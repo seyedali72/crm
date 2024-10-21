@@ -20,8 +20,8 @@ export default function Home() {
       setContactList(contacts)
     }
   }, [user])
-  const convertToLead = async (obj: string) => {
-    let body = { contactId: obj, expert: user?._id, assignedAt: Date.now() }
+  const convertToLead = async (obj: any) => {
+    let body = { ...obj, contactId: obj._id, expert: user?._id, assignedAt: Date.now(), status: 'سرنخ جدید', converted: true }
     let res = await createLead(body)
     if (!res?.error) {
       await editContact(obj, { converted: true })
@@ -31,13 +31,9 @@ export default function Home() {
   const checkStatus = async (id: any) => {
     toast.success('در حال پردازش')
     let res = await getCheckStatus(id)
-    if (res.lead) {
-      router.replace(`/expert/leads/${res.lead}`)
+    if (res?.lead !== undefined) {
+      router.replace(`/expert/leads/${res?.lead}`)
     }
-    if (res.customer) {
-      router.replace(`/expert/customers/${res.customer}`)
-    }
-
   }
   useEffect(() => {
     fetchContactList()
@@ -85,9 +81,10 @@ export default function Home() {
                     <td>{contact.categoryId?.name}</td>
                     <td>{contact.companyId?.name}</td>
                     {contact?.converted ?
-                      <td><button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => checkStatus(contact?._id)}> <i className="fa fa-refresh px-1"></i>جزئیات </button></td> :
-                      <td className="text-center">
-                        <button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => convertToLead(contact?._id)}> <i className="fa fa-refresh px-1"></i>تبدیل به سرنخ </button>
+                      <td><button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => checkStatus(contact?._id)}> <i className="fa fa-refresh px-1"></i>جزئیات </button>
+                        <Link href={`/expert/contacts/${contact?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i> ویرایش</Link></td>
+                      : <td className="text-center">
+                        <button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => convertToLead(contact)}> <i className="fa fa-refresh px-1"></i>تبدیل به سرنخ </button>
                         <Link href={`/expert/contacts/${contact?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i> ویرایش</Link>
                         <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(contact?._id)} />, { autoClose: false, })}> <i className="fa fa-trash px-1"></i>حذف </button>
                       </td>}

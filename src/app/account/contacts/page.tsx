@@ -1,49 +1,30 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { deleteContact, editContact, getCheckStatus, getContacts } from '../../action/contact.action'
 import { toast } from 'react-toastify'
-import { Confirmation } from '../../components/Confirmation'
-import { createLead, editLead } from '../../action/lead.action'
+import { getCheckStatus, getContacts } from '../../action/contact.action'
 import { useRouter } from 'next/navigation'
-import { useUser } from '../../context/UserProvider'
-
+ 
 export default function Home() {
   const [contactList, setContactList] = useState([])
   const [filter, setFilter] = useState('')
-  const [mutated, setMutated] = useState(false)
   const router = useRouter()
-  const { user } = useUser()
-  const fetchContactList = useCallback(async () => {
+   const fetchContactList = useCallback(async () => {
     let contacts = await getContacts({ isDeleted: false })
     setContactList(contacts)
   }, [])
-  const convertToLead = async (obj: string) => {
-    let body = { contactId: obj }
-    let res = await createLead(body)
-    if (!res?.error) {
-      await editContact(obj, { converted: true })
-      router.replace(`/account/leads/${res?._id}`)
-    } else { toast.error(res?.error) }
-  }
+
   const checkStatus = async (id: any) => {
     toast.success('در حال پردازش')
     let res = await getCheckStatus(id)
     if (res.lead) {
       router.replace(`/account/leads/${res.lead}`)
     }
-    if (res.customer) {
-      router.replace(`/account/customers/${res.customer}`)
-    }
-
   }
   useEffect(() => {
     fetchContactList()
-  }, [fetchContactList, mutated])
-  const handleDelete = async (contactId: any) => {
-    let res = await deleteContact(contactId)
-    if (!res.error) { setMutated(!mutated) }
-  }
+  }, [fetchContactList])
+
   return (
     <>
       <nav aria-label="breadcrumb">
@@ -57,7 +38,6 @@ export default function Home() {
           <div className="col-md-6">
             <input type="text" onChange={(e: any) => setFilter(e.target.value)} placeholder='فیلتر براساس نام یا شماره موبایل ' className="form-control form-control-sm" />
           </div>
-          <Link href="/account/contacts/create" className="btn bg-success text-white btn-sm" > افزودن مخاطب جدید </Link>
         </section>
         <section className="table-responsive">
           <table className="table table-hover table-striped">
@@ -84,11 +64,7 @@ export default function Home() {
                     <td>{contact.companyId?.name}</td>
                     {contact?.converted ?
                       <td><button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => checkStatus(contact?._id)}> <i className="fa fa-refresh px-1"></i>جزئیات </button></td> :
-                      <td className="text-center">
-                        <button type="button" className="btn btn-sm bg-custom-2 ms-1" onClick={() => convertToLead(contact?._id)}> <i className="fa fa-refresh px-1"></i>تبدیل به سرنخ </button>
-                        <Link href={`/account/contacts/${contact?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i> ویرایش</Link>
-                        <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(contact?._id)} />, { autoClose: false, })}> <i className="fa fa-trash px-1"></i>حذف </button>
-                      </td>}
+                      'تبدیل نشده است'}
                   </tr>)
                 }
               })}
@@ -96,7 +72,6 @@ export default function Home() {
           </table>
         </section>
       </section>
-
     </>
   );
 }

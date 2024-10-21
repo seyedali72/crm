@@ -28,14 +28,14 @@ const baseExpertSchema = new Schema<IExpert, Model<IExpert, any, any>, any>(
 
 baseExpertSchema.method({
 	softDelete: async function () {
-		this.mobile_number += '-deleted'
+		this.user_name += '-deleted'
 		this.$isDeleted(true)
 		this.isDeleted = true
 		this.deletedAt = new Date()
 		return this.save()
 	},
 	restore: async function () {
-		this.mobile_number = this.mobile_number.replace('-deleted', '')
+		this.user_name = this.user_name.replace('-deleted', '')
 		this.$isDeleted(false)
 		this.isDeleted = false
 		this.deletedAt = null

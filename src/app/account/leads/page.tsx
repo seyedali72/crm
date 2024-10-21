@@ -1,14 +1,11 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { deleteLead, getLeads } from '../../action/lead.action'
-import { toast } from 'react-toastify'
-import { Confirmation } from '../../components/Confirmation'
+import { getLeads } from '@/app/action/lead.action'
 
 export default function Home() {
   const [leadList, setLeadList] = useState([])
   const [filter, setFilter] = useState('')
-  const [mutated, setMutated] = useState(false)
   const fetchLeadList = useCallback(async () => {
     let leads = await getLeads({ isDeleted: false })
     setLeadList(leads)
@@ -16,11 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchLeadList()
-  }, [fetchLeadList, mutated])
-  const handleDelete = async (leadId: any) => {
-    let res = await deleteLead(leadId)
-    if (!res.error) { setMutated(!mutated) }
-  }
+  }, [fetchLeadList])
 
   return (
     <>
@@ -34,10 +27,7 @@ export default function Home() {
         <section className="d-flex justify-content-between align-items-center mt-1  mb-3 border-bottom pb-3" >
           <div className="col-md-6">
             <input type="text" onChange={(e: any) => setFilter(e.target.value)} placeholder='فیلتر براساس نام یا شماره موبایل ' className="form-control form-control-sm" />
-          </div>
-          <Link href="/account/contacts" className="btn bg-success text-white btn-sm" >
-            افزودن سرنخ جدید
-          </Link>
+          </div> 
         </section>
         <section className="table-responsive">
           <table className="table table-hover table-striped">
@@ -54,19 +44,19 @@ export default function Home() {
             </thead>
             <tbody>
               {leadList.map((lead: any, idx: number) => {
-                if (lead.contactId.name.includes(filter) || lead.contactId.phone_number_1.includes(filter)) {
+                if (lead.name.includes(filter) || lead.phone_number_1.includes(filter)) {
                   return (<tr key={idx}>
                     <td className='text-center'>{idx + 1}</td>
-                    <td >{lead.contactId.name} </td>
-                    <td>{lead.contactId.status}</td>
-                    <td>{lead.contactId.phone_number_1}</td>
-                    <td>{lead.call.length && lead.call.length}</td>
-                    <td><Link href={`/account/expert/${lead?.expert?._id}`}>{lead?.expert?.employe_id?.name}</Link></td>
+                    <td >{lead.name} </td>
+                    <td>{lead.status}</td>
+                    <td>{lead.phone_number_1}</td>
+                    <td>{lead?.call?.length && lead?.call?.length}</td>
+                    <td><Link href={`/account/experts/${lead?.expert?._id}`}>{lead?.expert?.employe_id?.name}</Link></td>
                     <td className="  text-center">
                       <Link href={`/account/leads/${lead?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>
-                      <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(lead?._id)} />, { autoClose: false, })}>
+                      {/* <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(lead?._id)} />, { autoClose: false, })}>
                         <i className="fa fa-trash px-1"></i>حذف
-                      </button>
+                      </button> */}
                     </td>
                   </tr>)
                 }

@@ -39,7 +39,7 @@ export default function Home() {
           <div className="col-md-6">
             <input type="text" onChange={(e: any) => setFilter(e.target.value)} placeholder='فیلتر براساس نام یا شماره موبایل ' className="form-control form-control-sm" />
           </div>
-          <Link href="/expert/contacts" className="btn bg-success text-white btn-sm" >
+          <Link href="/expert/leads/create" className="btn bg-success text-white btn-sm" >
             افزودن سرنخ جدید
           </Link>
         </section>
@@ -57,12 +57,12 @@ export default function Home() {
             </thead>
             <tbody>
               {leadList.map((lead: any, idx: number) => {
-                if (lead.contactId.name.includes(filter) || lead.contactId.phone_number_1.includes(filter)) {
+                if (lead.name.includes(filter) || lead.phone_number_1.includes(filter)) {
                   return (<tr key={idx}>
                     <td className='text-center'>{idx + 1}</td>
-                    <td >{lead.contactId.name} </td>
-                    <td>{lead.contactId.status}</td>
-                    <td>{lead.contactId.phone_number_1}</td>
+                    <td >{lead.name} </td>
+                    <td>{lead.status}</td>
+                    <td>{lead.phone_number_1}</td>
                     <td>{lead.call.length && lead.call.length}</td>
                      <td className="  text-center">
                       <Link href={`/expert/leads/${lead?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>

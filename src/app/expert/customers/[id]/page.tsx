@@ -57,7 +57,7 @@ export default function EditLead() {
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
         setEditInfo(false)
     }

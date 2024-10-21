@@ -32,7 +32,7 @@ export default function CreateLead() {
             reset()
             router.replace('/account/leads')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

@@ -29,10 +29,7 @@ export default function CustomerCategory() {
     useEffect(() => {
         allCustomerCats()
     }, [mutated, allCustomerCats])
-    const handleDelete = async (catId: any) => {
-        let res = await deleteCustomerCat(catId)
-        if (!res.error) { setMutated(!mutated) }
-    }
+ 
     return (
         <>
             <nav aria-label="breadcrumb">
@@ -41,7 +38,7 @@ export default function CustomerCategory() {
                     <li className="breadcrumb-item active" aria-current="page"> لیست زمینه های فعالیت مشتریان</li>
                 </ol>
             </nav>
-            <section className="main-body-container rounded">
+            {/* <section className="main-body-container rounded">
                 <form action="post" onSubmit={handleSubmit(handleCreateCustomerCats)} method='Post'>
                     <section className="row">
                         <div className="col-12 col-md-6">
@@ -59,7 +56,7 @@ export default function CustomerCategory() {
                         </div>
                     </section>
                 </form>
-            </section>
+            </section> */}
             <section className="main-body-container rounded">
                 <section className="d-flex justify-content-between align-items-center mt-1mb-3 border-bottom pb-3" >
                     <section className="main-body-title">
@@ -78,9 +75,9 @@ export default function CustomerCategory() {
                                 <th>زمینه فعالیت والد</th>
                                 <th>تعداد اعضا</th>
                                 <th>وضعیت</th>
-                                <th className=" text-center">
+                                {/* <th className=" text-center">
                                     <i className="fa fa-cogs px-1"></i>تنظیمات
-                                </th>
+                                </th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -92,12 +89,12 @@ export default function CustomerCategory() {
                                         <td>{cat?.parent !== undefined ? cat?.parent?.name : '---'}</td>
                                         <td>{cat.users?.length}</td>
                                         <td>{cat.status}</td>
-                                        <td className="text-center">
+                                        {/* <td className="text-center">
                                             <Link href={`/account/customers/categories/${cat?._id}`} className="btn btn-sm bg-custom-4 ms-1" ><i className="fa fa-edit px-1"></i>جزئیات</Link>
                                             <button type="button" className="btn btn-sm bg-custom-3 ms-1" onClick={() => toast(<Confirmation onDelete={() => handleDelete(cat?._id)} />, { autoClose: false, })}>
                                                 <i className="fa fa-trash px-1"></i>حذف
                                             </button>
-                                        </td>
+                                        </td> */}
                                     </tr>)
                                 }
                             })}

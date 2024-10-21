@@ -42,7 +42,7 @@ export default function DialogSection({ singleLead, mutated, owner }: any) {
                 <button type="submit" className="my-2 py-1 px-3 rounded-2 text-white fs90 cursorPointer border-0 bg-success">ثبت</button>
             </form>}
             {reverseArray?.map((el: any) => {
-                if (el._id !== dialogId) {
+                if (el?._id !== dialogId) {
                     return (
                         <div key={nanoid()} className="d-flex align-items-end border-1 border-bottom p-2 mb-2">
                             <div className="w-100 d-flex justify-content-between">
@@ -57,7 +57,7 @@ export default function DialogSection({ singleLead, mutated, owner }: any) {
                     )
                 } else {
                     return (
-                        <form className="w-100" action="post" onSubmit={handleSubmit2(handleEditDialog)}>
+                        <form key={nanoid()} className="w-100" action="post" onSubmit={handleSubmit2(handleEditDialog)}>
                             <textarea className="form-control input-group" rows={1} placeholder='خلاصه مکالمه' {...register2('text', { required: 'متن مکالمه را وارد کنید', })} ></textarea>
                             <button type="submit" className="btn btn-sm bg-success text-white my-2">ثبت ویرایش</button>
                         </form>

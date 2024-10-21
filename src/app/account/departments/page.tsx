@@ -46,7 +46,7 @@ export default function Departments() {
                     <section className="row">
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">عنوان دپارتمان </label>
-                            <input type="text" className="form-control form-control-sm" {...register('name', { required: 'عنوان دپارتمان را وارد کنید', })} />
+                            <input type="text" placeholder="عنوان دپارتمان" className="form-control form-control-sm" {...register('name', { required: 'عنوان دپارتمان را وارد کنید', })} />
                         </div>
                         <div className="col-12 col-md-6">
                             <label className='my-1' htmlFor="">دپارتمان والد </label>

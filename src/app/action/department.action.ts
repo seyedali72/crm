@@ -3,8 +3,7 @@
 import Department from '@/models/Department'
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
-import Expert from '@/models/Expert'
-import Employe from '@/models/Employe'
+ import Employe from '@/models/Employe'
 
 /* ----- team ----- */
 export const getDepartments = async (search?: any) => {
@@ -28,7 +27,7 @@ export const getSingleDepartment = async (id: string) => {
     await connect()
 
     try {
-        const singleDepartment = await Department.findById(id).populate([{ path: 'users', model: Expert, populate: [{ path: 'employe_id', model: Employe }] }, { path: 'parent', model: Department }])
+        const singleDepartment = await Department.findById(id).populate([{ path: 'users', model: Employe, populate: { path: 'department_id',select:'name', model: Department } }, { path: 'parent', model: Department }])
         return JSON.parse(JSON.stringify(singleDepartment))
     } catch (error) {
         console.log(error)

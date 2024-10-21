@@ -151,7 +151,7 @@ th {
   height: 100% !important;
   position: fixed !important;
   background: #0003 !important;
-  z-index: 1 !important;
+  z-index: 11 !important;
   backdrop-filter: blur(6px) !important;
   top: 3.5rem !important;
   left: 0 !important;
@@ -202,7 +202,7 @@ th {
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
-.popupCustome {
+.popupCustom {
   position: fixed;
   padding: 5rem 25%;
   left: 0;

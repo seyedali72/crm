@@ -2,10 +2,8 @@
 
 import connect from '../lib/db'
 import { buildQuery } from '../utils/helpers'
-import Expert from '@/models/Expert'
-import CustomerCat from '@/models/CustomerCategory'
-import Customer from '@/models/Customer'
-import Lead from '@/models/Lead'
+ import CustomerCat from '@/models/CustomerCategory'
+ import Lead from '@/models/Lead'
 import Company from '@/models/Company'
 import Contact from '@/models/Contact'
 
@@ -79,7 +77,7 @@ export const deleteCustomerCat = async (customerCatId: string) => {
     }
 }
 
-export const addCustomerToCustomerCat = async (id: string, body: any, type: string) => {
+export const addLeatToCustomerCat = async (id: string, body: any, type: string) => {
     await connect()
 
     try {
@@ -87,7 +85,7 @@ export const addCustomerToCustomerCat = async (id: string, body: any, type: stri
         if (type == 'company') {
             await Company.findByIdAndUpdate(body, { categoryId: result?._id })
         } else {
-            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
+            await Lead.findByIdAndUpdate(body, { categoryId: result?._id })
         }
 
         return JSON.parse(JSON.stringify(result))
@@ -97,19 +95,21 @@ export const addCustomerToCustomerCat = async (id: string, body: any, type: stri
     }
 }
 
-export const editCustomerFromCustomerCat = async (id: string, body: any, type: string, last: any) => {
+export const editLeadFromCustomerCat = async (id: string, body: any, type: string, last: any) => {
     await connect()
 
     try {
         let remove = await CustomerCat.findByIdAndUpdate(last, { $pull: { users: body } }, { new: true })
-        let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
-        if (type == 'company') {
-            await Company.findByIdAndUpdate(body, { categoryId: result?._id })
-        } else {
-            await Contact.findByIdAndUpdate(body, { categoryId: result?._id })
-        }
+        if (remove !== undefined) {
+            let result = await CustomerCat.findByIdAndUpdate(id, { $push: { users: body } }, { new: true })
+            if (type == 'company') {
+                await Company.findByIdAndUpdate(body, { categoryId: result?._id })
+            } else {
+                await Lead.findByIdAndUpdate(body, { categoryId: result?._id })
+            }
 
-        return JSON.parse(JSON.stringify(result))
+            return JSON.parse(JSON.stringify(result))
+        }
     } catch (error) {
         console.log(error)
         return { error: 'خطا در تغییر کارمند' }

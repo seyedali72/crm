@@ -49,7 +49,7 @@ export default function Home() {
             reset()
             router.replace('/account/expert')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
 

@@ -1,23 +1,15 @@
 'use client'
 
-import { createCustomer } from "@/app/action/customer.action"
-import { addCustomerToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
-import { addCustomerToExpert,   getExperts } from "@/app/action/expert.action"
-import {    editCompany, getSingleCompany } from "@/app/action/company.action"
+import { addLeatToCustomerCat, getCustomerCats } from "@/app/action/customerCat.action"
+import { editCompany, getSingleCompany } from "@/app/action/company.action"
 import { useUser } from "@/app/context/UserProvider"
-import { convertToPersianDate } from "@/app/utils/helpers"
 import { nanoid } from "nanoid"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
-interface FormValues {
-    text: string
-}
-interface FormValues2 {
-    text: string
-}
+ 
 interface FormValues3 {
     name: string
     phone_number_1: number
@@ -31,26 +23,17 @@ interface FormValues3 {
 }
 export default function addDialogs() {
     const [mutated, setMutated] = useState(false)
-    const [dialogId, setDialogId] = useState('')
     const [status, setStatus] = useState('')
     const [catId, setCatId] = useState<any>()
-    const [expertId, setExpertId] = useState('')
-    const [dialogText, setDialogText] = useState('')
     const [catList, setCatList] = useState<any>([])
-    const [expertsList, setExpertList] = useState<any>([])
     const [singleCompany, setSingleCompany] = useState<any>([])
     const [deletedCheck, setDeletedCheck] = useState(false)
-    const [popup, setPopup] = useState(false)
-    const [customerPopup, setCustomerPopup] = useState(false)
     const [editInfo, setEditInfo] = useState(false)
     const { id }: any = useParams()
     const { user } = useUser()
-    const router = useRouter()
     const company = useCallback(async () => {
         let company = await getSingleCompany(id)
         company.isDeleted === false ? setSingleCompany(company) : setDeletedCheck(true)
-        let experts = await getExperts({ isDeleted: false })
-        setExpertList(experts)
         let categories = await getCustomerCats({ isDeleted: false })
         setCatList(categories)
     }, [])
@@ -58,36 +41,33 @@ export default function addDialogs() {
         company()
     }, [company, mutated])
 
-  
-    const { handleSubmit, register, reset } = useForm<FormValues>()
-    const { handleSubmit: handleSubmit2, register: register2, } = useForm<FormValues2>({ values: { text: dialogText } })
-    const { handleSubmit: handleSubmit3, register: register3, setValue: setValue3 } = useForm<FormValues3>({ values: { name: singleCompany?.name, phone_number_1: singleCompany?.phone_number_1,phone_number_2: singleCompany?.phone_number_2, email: singleCompany?.email, website: singleCompany?.website, title: singleCompany?.title, address: singleCompany?.address, source: singleCompany?.source, description: singleCompany?.description } })
+    const { handleSubmit: handleSubmit3, register: register3, setValue: setValue3 } = useForm<FormValues3>({ values: { name: singleCompany?.name, phone_number_1: singleCompany?.phone_number_1, phone_number_2: singleCompany?.phone_number_2, email: singleCompany?.email, website: singleCompany?.website, title: singleCompany?.title, address: singleCompany?.address, source: singleCompany?.source, description: singleCompany?.description } })
 
-  
+
     const handleEditCompany = async (obj: any) => {
-        let res = await editCompany(singleCompany?._id, obj, user?._id)
+        let res = await editCompany(singleCompany?._id, obj )
         if (!res.error) {
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
         setEditInfo(false)
     }
-  
+
     const changeStatus = async (type: string) => {
         let status = { status: type }
-        let res = await editCompany(singleCompany?._id, status, user?._id)
+        let res = await editCompany(singleCompany?._id, status )
         if (!res.error) {
             toast.success('انجام شده')
             setMutated(!mutated)
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
- 
+
     const addToCategory = async (companyId: any) => {
-        let res = await addCustomerToCustomerCat(catId, companyId, 'company')
+        let res = await addLeatToCustomerCat(catId, companyId, 'company')
         if (!res?.error) {
             setMutated(!mutated)
         }
@@ -104,7 +84,7 @@ export default function addDialogs() {
                         <li className="breadcrumb-item"><Link href="/account/companies">لیست شرکت ها</Link></li>
                         <li className="breadcrumb-item active" aria-current="page">{singleCompany?.name}</li>
                     </ol>
-                </nav> 
+                </nav>
                 <section className="d-flex flex-column flex-md-row">
                     <section className="col-md-8 ps-2">
                         <section className="main-body-container rounded">
@@ -199,7 +179,7 @@ export default function addDialogs() {
                     </section>
                     <section className="col-md-4 pe-2">
                         <section className="main-body-container rounded">
-                               <div className="d-flex gap-1 align-items-center mb-2">
+                            <div className="d-flex gap-1 align-items-center mb-2">
                                 <span className="text-nowrap" >زمینه فعالیتی سرنخ:</span>
                                 {singleCompany?.categoryId == undefined ? <>  <select onChange={(e: any) => setCatId(e.target.value)} className="form-control form-control-sm">
                                     <option value='' hidden>یک زمینه را انتخاب کنید</option>
@@ -218,7 +198,7 @@ export default function addDialogs() {
                                     {singleCompany?.expert == undefined && <option value='ارجاع به کارشناس'>ارجاع به کارشناس</option>}
                                     <option value='تبدیل به مشتری'>تبدیل به مشتری</option>
                                 </select>
-                                <button onClick={() => {  changeStatus(status) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
+                                <button onClick={() => { changeStatus(status) }} type="button" className="btn btn-sm bg-primary text-white">ثبت</button>
                             </div>
                         </section>
                         <section className="main-body-container rounded">
@@ -235,7 +215,7 @@ export default function addDialogs() {
                             <p><i className="fa fa-calendar"></i> مناسبت تقویمی<b> 20 شهریور</b></p>
                             <p><i className="fa fa-birthday-cake"></i> تولد سرنخ <b> 21 آذر</b></p>
                         </section>
-                        
+
                     </section>
                 </section>
             </>

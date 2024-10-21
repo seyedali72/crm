@@ -40,7 +40,7 @@ export default function EditContact() {
             reset()
             router.replace('/account/contacts')
         } else {
-            toast.error('ridi')
+            toast.error('ناموفق بود')
         }
     }
     const { id }: any = useParams()

@@ -60,10 +60,10 @@ export default function HeaderPanel() {
                         return (
                           <li key={nanoid()} className="list-group-item lis-group-item-action p-3">
                             <section className="media">
-                              <i className={`fa ${reminder?.type == 'calendar' ? 'fa-calendar' : reminder?.type == 'call' ? 'fa-phone' : reminder?.type == 'birthday' ? 'fa-birthday-cake' : 'fa-calendar-check-o'}`}></i>
+                              <i className={`fa ${reminder?.type == 'مناسبت تقویمی' ? 'fa-calendar' : reminder?.type == 'تماس تلفنی' ? 'fa-phone' : reminder?.type == 'مناسبت تولد' ? 'fa-birthday-cake' : 'fa-calendar-check-o'}`}></i>
                               <section className="media-body pr-2">
-                                <h5 className="notify-user">{reminder?.type} - {reminder?.leadId?.contactId?.name} </h5>
-                                <p className="notify-text mb-0">{convertToPersianDate(reminder?.schedule, 'YYMDHM')}</p>
+                                <h5 className="notify-user">{reminder?.type} - {reminder?.leadId?.name} </h5>
+                                <p className="notify-text mb-0">{convertToPersianDate(reminder?.schedule, 'YYMDHM')}{' '}{reminder?.opportunityId !== undefined ? 'فرصت فروش':'سرنخ'}</p>
                                 {/* <p className="notify-time">30 دیقه قبل</p> */}
                               </section>
                             </section>
